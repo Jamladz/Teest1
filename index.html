@@ -1,99 +1,1372 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>دفع TON فعلي</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gift Winner</title>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body {
-      font-family: Tahoma, sans-serif;
-      background: #f4f9ff;
+    :root {
+      --primary-color: #6e8efb;
+      --secondary-color: #a777e3;
+      --dark-bg: #0a0a0a;
+      --card-bg: rgba(30, 30, 30, 0.7);
+      --text-light: #ffffff;
+      --text-muted: #aaaaaa;
+      --bronze: #cd7f32;
+      --silver: #c0c0c0;
+      --gold: #ffd700;
+      --platinum: #e5e4e2;
+      --diamond: #b9f2ff;
+    }
+    
+    * {
       margin: 0;
-      padding: 40px 20px;
-      direction: rtl;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      background-color: var(--dark-bg);
+      color: var(--text-light);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: linear-gradient(135deg, #121212 0%, #000000 100%);
+    }
+    
+    .wallet-header {
+      background: rgba(20, 20, 20, 0.9);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+      z-index: 10;
+    }
+    
+    .logo {
+      font-weight: 700;
+      font-size: 18px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    #ton-connect {
+      width: 180px;
+    }
+    
+    .main-header {
       text-align: center;
+      padding: 25px 20px 15px;
+      position: relative;
     }
-
-    .container {
-      max-width: 400px;
-      margin: auto;
-      background: #fff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    
+    .main-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(110, 142, 251, 0.3);
     }
-
-    h1 {
-      color: #007aff;
+    
+    .main-header p {
+      font-size: 14px;
+      opacity: 0.8;
+      color: var(--text-muted);
     }
-
-    #payBtn {
+    
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+    }
+    
+    .page {
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .page.active {
+      display: flex;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .gift-stack {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      height: 200px;
+      margin: 15px 0 25px;
+      perspective: 1000px;
+    }
+    
+    .gift-card {
+      position: absolute;
+      width: 100%;
+      height: 180px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(110, 142, 251, 0.3);
+      border: 2px solid rgba(110, 142, 251, 0.2);
+      transition: transform 0.3s, box-shadow 0.3s;
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+    }
+    
+    .gift-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(110, 142, 251, 0.1) 0%, rgba(167, 119, 227, 0.1) 100%);
+    }
+    
+    .gift-card:nth-child(1) {
+      z-index: 5;
+      transform: translateY(0) rotateZ(0deg);
+      background-image: url('https://i.suar.me/ZvQaP/l');
+    }
+    
+    .gift-card:nth-child(2) {
+      z-index: 4;
+      transform: translateY(10px) rotateZ(2deg);
+      background-image: url('https://i.suar.me/0A5lY/l');
+      filter: brightness(0.8);
+      clip-path: inset(0 0 20% 0);
+    }
+    
+    .gift-card:nth-child(3) {
+      z-index: 3;
+      transform: translateY(20px) rotateZ(-2deg);
+      background-image: url('https://i.suar.me/GE5Pj/l');
+      filter: brightness(0.7);
+      clip-path: inset(0 0 40% 0);
+    }
+    
+    .gift-card:nth-child(4) {
+      z-index: 2;
+      transform: translateY(30px) rotateZ(1deg);
+      background-image: url('https://i.suar.me/yEWOz/l');
+      filter: brightness(0.6);
+      clip-path: inset(0 0 60% 0);
+    }
+    
+    .gift-card:nth-child(5) {
+      z-index: 1;
+      transform: translateY(40px) rotateZ(-1deg);
+      background-image: url('https://i.suar.me/A3WM3/l');
+      filter: brightness(0.5);
+      clip-path: inset(0 0 80% 0);
+    }
+    
+    .leaderboard {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 20px;
+      width: 100%;
+      max-width: 350px;
+      margin-top: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(5px);
+    }
+    
+    .leaderboard h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .leaderboard p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-light);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .highlight {
+      color: var(--secondary-color);
+      font-weight: 600;
+    }
+    
+    .timer {
+      margin-top: 15px;
+      font-size: 15px;
+      color: var(--primary-color);
+      text-align: center;
+      font-weight: 500;
+      padding: 8px 15px;
+      background: rgba(110, 142, 251, 0.1);
+      border-radius: 10px;
+      display: inline-block;
+    }
+    
+    .points-display {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 350px;
+      margin-top: 25px;
+      padding: 0 10px;
+    }
+    
+    .points-card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      padding: 15px;
+      width: 48%;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s;
+    }
+    
+    .points-card:hover {
+      transform: translateY(-3px);
+    }
+    
+    .points-card h3 {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    
+    .points-card p {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    
+    .rank-badge {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-top: 5px;
+      display: inline-block;
+    }
+    
+    .bronze {
+      background-color: var(--bronze);
+    }
+    
+    .silver {
+      background-color: var(--silver);
+      color: #333;
+    }
+    
+    .gold {
+      background-color: var(--gold);
+      color: #333;
+    }
+    
+    .platinum {
+      background-color: var(--platinum);
+      color: #333;
+    }
+    
+    .diamond {
+      background: linear-gradient(135deg, var(--diamond), #a5f1ff);
+      color: #333;
+    }
+    
+    .tasks-container {
+      width: 100%;
+      max-width: 350px;
       margin-top: 20px;
-      padding: 12px 24px;
-      background-color: #007aff;
+    }
+    
+    .task-item {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s;
+    }
+    
+    .task-item:hover {
+      transform: translateY(-3px);
+    }
+    
+    .task-info {
+      flex: 1;
+    }
+    
+    .task-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-light);
+      margin-bottom: 5px;
+    }
+    
+    .task-description {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .task-points {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--secondary-color);
+      margin-left: 10px;
+    }
+    
+    .task-button {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       color: white;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 8px;
+      padding: 8px 15px;
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: transform 0.3s, box-shadow 0.3s;
+      min-width: 80px;
+      text-align: center;
     }
-
-    #payBtn:disabled {
-      background: #b0cfff;
-      cursor: not-allowed;
+    
+    .task-button.completed {
+      background: #4CAF50;
     }
-
-    #status {
-      margin-top: 20px;
-      font-size: 15px;
-      color: #444;
+    
+    .task-button:hover:not(.completed) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(110, 142, 251, 0.4);
+    }
+    
+    .profile-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: white;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+    
+    .profile-username {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .profile-tier {
+      font-size: 16px;
+      margin-bottom: 20px;
+      padding: 5px 15px;
+      border-radius: 20px;
+    }
+    
+    .profile-points {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    
+    .profile-rank {
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+    
+    .navigation {
+      background-color: rgba(20, 20, 20, 0.95);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.5);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .nav-btn {
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      padding: 8px 20px;
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+    
+    .nav-btn.active {
+      color: var(--primary-color);
+      background: rgba(110, 142, 251, 0.1);
+      transform: translateY(-5px);
+    }
+    
+    .nav-btn i {
+      font-size: 22px;
+      margin-bottom: 5px;
+    }
+    
+    .status {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--primary-color);
+      text-align: center;
+      padding: 8px 15px;
+      background: rgba(110, 142, 251, 0.1);
+      border-radius: 10px;
+    }
+    
+    .glow-effect {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(110, 142, 251, 0.3) 0%, rgba(110, 142, 251, 0) 70%);
+      border-radius: 50%;
+      z-index: -1;
+    }
+    
+    .glow-1 {
+      top: 20%;
+      left: 10%;
+    }
+    
+    .glow-2 {
+      bottom: 15%;
+      right: 10%;
+    }
+    
+    .progress-container {
+      width: 100%;
+      max-width: 350px;
+      margin: 20px 0;
+    }
+    
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    
+    .progress-bar {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      border-radius: 5px;
+      transition: width 0.5s ease;
+    }
+    
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: #f00;
+      opacity: 0;
+      z-index: 1000;
+      animation: confetti-fall 3s ease-in-out forwards;
+    }
+    
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(1000px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 25px;
+      width: 90%;
+      max-width: 350px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+    
+    .modal-title {
+      font-size: 20px;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+    
+    .daily-rewards {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
+    
+    .day-reward {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border-radius: 10px;
+      width: 14%;
+      background: rgba(110, 142, 251, 0.1);
+    }
+    
+    .day-reward.active {
+      background: rgba(110, 142, 251, 0.3);
+      border: 1px solid var(--primary-color);
+    }
+    
+    .day-reward.completed {
+      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid #4CAF50;
+    }
+    
+    .day-number {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-light);
+    }
+    
+    .day-points {
+      font-size: 12px;
+      color: var(--secondary-color);
+      margin-top: 5px;
+    }
+    
+    .close-modal {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    
+    .countdown {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 10px;
+    }
+    
+    .telegram-task {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .telegram-task .task-button {
+      position: relative;
+    }
+    
+    .telegram-task .progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      width: 100%;
+    }
+    
+    .telegram-task .progress-fill {
+      height: 100%;
+      background: var(--secondary-color);
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    
+    .premium-task {
+      border: 1px solid var(--secondary-color);
+    }
+    
+    .premium-badge {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-left: 5px;
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-  <div class="container">
-    <h1>ادفع 0.01 TON الآن</h1>
-    <div id="ton-connect"></div>
-    <button id="payBtn" disabled>💸 الدفع الآن</button>
-    <p id="status">🔌 لم يتم الاتصال بعد</p>
+  <div class="app-container">
+    <div class="wallet-header">
+      <div class="logo">Gift Winner</div>
+      <div id="ton-connect"></div>
+    </div>
+    
+    <div class="main-header">
+      <div class="glow-effect glow-1"></div>
+      <div class="glow-effect glow-2"></div>
+      <h1 id="page-title">Gift Winner</h1>
+      <p id="page-description">Win amazing prizes with your points!</p>
+    </div>
+    
+    <div class="main-content">
+      <!-- Home Page -->
+      <div class="page active" id="home-page">
+        <div class="gift-stack">
+          <div class="gift-card"></div>
+          <div class="gift-card"></div>
+          <div class="gift-card"></div>
+          <div class="gift-card"></div>
+          <div class="gift-card"></div>
+        </div>
+        
+        <p class="status" id="status">🔌 Wallet not connected</p>
+        
+        <div class="points-display">
+          <div class="points-card">
+            <h3>Your Points</h3>
+            <p id="user-points">0</p>
+            <div id="rank-badge" class="rank-badge bronze">Bronze I</div>
+          </div>
+          <div class="points-card">
+            <h3>Your Rank</h3>
+            <p id="user-rank">+100K</p>
+          </div>
+        </div>
+        
+        <div class="progress-container">
+          <div class="progress-label">
+            <span>Progress to next tier</span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+        
+        <div class="leaderboard">
+          <h2>Current Competition</h2>
+          <p>Complete tasks and earn 900 points to improve your rank! <span class="highlight">Top user</span> when time ends will win the grand prize!</p>
+          <div class="timer">⏳ Time left: 3 days 12 hours</div>
+        </div>
+      </div>
+      
+      <!-- Tasks Page -->
+      <div class="page" id="tasks-page">
+        <div class="tasks-container">
+          <h2 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">Available Tasks</h2>
+          
+          <!-- Daily Login Task -->
+          <div class="task-item" onclick="showDailyRewardsModal()">
+            <div class="task-info">
+              <div class="task-title">Daily Login</div>
+              <div class="task-description">Login for 7 consecutive days for rewards</div>
+            </div>
+            <div class="task-points">+5 to +35 points</div>
+            <button class="task-button" id="daily-login-btn">Rewards</button>
+          </div>
+          
+          <!-- Telegram Tasks -->
+          <div class="task-item telegram-task">
+            <div class="task-info">
+              <div class="task-title">Join Telegram Channel 1</div>
+              <div class="task-description">Join our first Telegram channel</div>
+            </div>
+            <div class="task-points">+10 points</div>
+            <button class="task-button" id="telegram-task-1" onclick="startTelegramTask(this, 'telegram-task-1')">Join Now</button>
+            <div class="progress-bar"><div class="progress-fill" id="telegram-progress-1"></div></div>
+          </div>
+          
+          <div class="task-item telegram-task">
+            <div class="task-info">
+              <div class="task-title">Join Telegram Channel 2</div>
+              <div class="task-description">Join our second Telegram channel</div>
+            </div>
+            <div class="task-points">+10 points</div>
+            <button class="task-button" id="telegram-task-2" onclick="startTelegramTask(this, 'telegram-task-2')">Join Now</button>
+            <div class="progress-bar"><div class="progress-fill" id="telegram-progress-2"></div></div>
+          </div>
+          
+          <!-- Premium Tasks -->
+          <div class="task-item premium-task">
+            <div class="task-info">
+              <div class="task-title">Buy Points <span class="premium-badge">0.2 TON</span></div>
+              <div class="task-description">Get 150 points for 0.2 TON</div>
+            </div>
+            <div class="task-points">+150 points</div>
+            <button class="task-button" onclick="buyPoints(0.2, 150)">Buy</button>
+          </div>
+          
+          <div class="task-item premium-task">
+            <div class="task-info">
+              <div class="task-title">Buy Points <span class="premium-badge">0.5 TON</span></div>
+              <div class="task-description">Get 450 points for 0.5 TON</div>
+            </div>
+            <div class="task-points">+450 points</div>
+            <button class="task-button" onclick="buyPoints(0.5, 450)">Buy</button>
+          </div>
+          
+          <div class="task-item premium-task">
+            <div class="task-info">
+              <div class="task-title">Buy Points <span class="premium-badge">1 TON</span></div>
+              <div class="task-description">Get 1000 points for 1 TON</div>
+            </div>
+            <div class="task-points">+1000 points</div>
+            <button class="task-button" onclick="buyPoints(1, 1000)">Buy</button>
+          </div>
+          
+          <div class="task-item premium-task">
+            <div class="task-info">
+              <div class="task-title">Buy Points <span class="premium-badge">10 TON</span></div>
+              <div class="task-description">Get 11000 points for 10 TON</div>
+            </div>
+            <div class="task-points">+11000 points</div>
+            <button class="task-button" onclick="buyPoints(10, 11000)">Buy</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Profile Page -->
+      <div class="page" id="profile-page">
+        <div class="profile-container">
+          <div id="profile-avatar" class="profile-avatar">??</div>
+          <div id="profile-username" class="profile-username">...</div>
+          <div id="profile-tier" class="profile-tier bronze">Bronze I</div>
+          <div class="profile-points">Points: <span id="profile-points-value">0</span></div>
+          <div class="profile-rank">Rank: <span id="profile-rank-value">+100K</span></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="navigation">
+      <button class="nav-btn active" onclick="switchPage('home-page')">
+        <i class="fas fa-home"></i>
+        Home
+      </button>
+      <button class="nav-btn" onclick="switchPage('tasks-page')">
+        <i class="fas fa-tasks"></i>
+        Tasks
+      </button>
+      <button class="nav-btn" onclick="switchPage('profile-page')">
+        <i class="fas fa-user"></i>
+        Profile
+      </button>
+    </div>
+  </div>
+  
+  <!-- Daily Rewards Modal -->
+  <div class="modal" id="daily-rewards-modal">
+    <div class="modal-content">
+      <div class="modal-title">Daily Rewards</div>
+      <p>Login daily to get extra points!</p>
+      
+      <div class="daily-rewards">
+        <div class="day-reward" id="day-1">
+          <div class="day-number">Day 1</div>
+          <div class="day-points">+5 points</div>
+        </div>
+        <div class="day-reward" id="day-2">
+          <div class="day-number">Day 2</div>
+          <div class="day-points">+10 points</div>
+        </div>
+        <div class="day-reward" id="day-3">
+          <div class="day-number">Day 3</div>
+          <div class="day-points">+15 points</div>
+        </div>
+        <div class="day-reward" id="day-4">
+          <div class="day-number">Day 4</div>
+          <div class="day-points">+20 points</div>
+        </div>
+        <div class="day-reward" id="day-5">
+          <div class="day-number">Day 5</div>
+          <div class="day-points">+25 points</div>
+        </div>
+        <div class="day-reward" id="day-6">
+          <div class="day-number">Day 6</div>
+          <div class="day-points">+30 points</div>
+        </div>
+        <div class="day-reward" id="day-7">
+          <div class="day-number">Day 7</div>
+          <div class="day-points">+35 points</div>
+        </div>
+      </div>
+      
+      <div class="countdown" id="daily-countdown"></div>
+      <button class="close-modal" onclick="claimDailyReward()">Claim Reward</button>
+      <button class="close-modal" onclick="closeModal()" style="background: var(--card-bg); margin-top: 10px;">Close</button>
+    </div>
   </div>
 
   <script>
+    // App State
+    const appState = {
+      points: 0,
+      rank: "+100K",
+      tasksCompleted: [],
+      maxPoints: 900, // Points needed to improve rank
+      dailyStreak: 0,
+      lastDailyClaim: null,
+      telegramTasks: {
+        'telegram-task-1': { completed: false, lastCompleted: null },
+        'telegram-task-2': { completed: false, lastCompleted: null }
+      },
+      walletConnected: false,
+      telegramUser: null
+    };
+
+    // Tier System
+    const tierSystem = [
+      { name: "Bronze I", minPoints: 0, maxPoints: 199, class: "bronze" },
+      { name: "Bronze II", minPoints: 200, maxPoints: 399, class: "bronze" },
+      { name: "Bronze III", minPoints: 400, maxPoints: 599, class: "bronze" },
+      { name: "Silver I", minPoints: 600, maxPoints: 999, class: "silver" },
+      { name: "Silver II", minPoints: 1000, maxPoints: 1999, class: "silver" },
+      { name: "Silver III", minPoints: 2000, maxPoints: 3999, class: "silver" },
+      { name: "Gold I", minPoints: 4000, maxPoints: 6999, class: "gold" },
+      { name: "Gold II", minPoints: 7000, maxPoints: 9999, class: "gold" },
+      { name: "Gold III", minPoints: 10000, maxPoints: 19999, class: "gold" },
+      { name: "Platinum I", minPoints: 20000, maxPoints: 49999, class: "platinum" },
+      { name: "Platinum II", minPoints: 50000, maxPoints: 99999, class: "platinum" },
+      { name: "Platinum III", minPoints: 100000, maxPoints: 499999, class: "platinum" },
+      { name: "Diamond I", minPoints: 500000, maxPoints: 999999, class: "diamond" },
+      { name: "Diamond II", minPoints: 1000000, maxPoints: 4999999, class: "diamond" },
+      { name: "Diamond III", minPoints: 5000000, maxPoints: 9999999, class: "diamond" },
+      { name: "Legend", minPoints: 10000000, maxPoints: Infinity, class: "diamond" }
+    ];
+
+    // Initialize TonConnect
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
       manifestUrl: 'https://jamladz.github.io/Teest1/tonconnect-manifest.json',
-      buttonRootId: 'ton-connect'
+      buttonRootId: 'ton-connect',
+      buttonTheme: {
+        backgroundColor: 'var(--primary-color)',
+        iconColor: 'white',
+        textColor: 'white',
+        modalBackground: '#121212',
+        modalTextColor: 'white',
+        modalHoverBackground: 'rgba(110, 142, 251, 0.1)'
+      }
     });
 
-    let wallet = null;
-
-    tonConnectUI.onStatusChange(userWallet => {
-      wallet = userWallet;
-      document.getElementById('payBtn').disabled = !wallet;
-      document.getElementById('status').textContent = wallet
-        ? `✅ متصل بمحفظة: ${wallet.account.address.slice(0, 12)}...`
-        : '🔌 لم يتم الاتصال بعد';
+    // Update wallet status
+    tonConnectUI.onStatusChange((wallet) => {
+      const statusElement = document.getElementById('status');
+      if (wallet) {
+        const shortAddress = wallet.account.address.slice(0, 6) + '...' + wallet.account.address.slice(-4);
+        statusElement.textContent = `✅ Connected: ${shortAddress}`;
+        statusElement.style.color = '#4CAF50';
+        statusElement.style.background = 'rgba(76, 175, 80, 0.1)';
+        appState.walletConnected = true;
+        
+        // Load user data when wallet connects
+        loadUserData(wallet.account.address);
+      } else {
+        statusElement.textContent = '🔌 Wallet not connected';
+        statusElement.style.color = 'var(--primary-color)';
+        statusElement.style.background = 'rgba(110, 142, 251, 0.1)';
+        appState.walletConnected = false;
+      }
     });
 
-    document.getElementById('payBtn').addEventListener('click', async () => {
-      if (!wallet) return;
+    // Switch between pages
+    function switchPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      document.getElementById(pageId).classList.add('active');
+      
+      // Update navigation buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.currentTarget.classList.add('active');
+      
+      // Update page title and description
+      if (pageId === 'home-page') {
+        document.getElementById('page-title').textContent = 'Gift Winner';
+        document.getElementById('page-description').textContent = 'Win amazing prizes with your points!';
+      } else if (pageId === 'tasks-page') {
+        document.getElementById('page-title').textContent = 'Tasks';
+        document.getElementById('page-description').textContent = 'Complete tasks to earn points!';
+      } else if (pageId === 'profile-page') {
+        document.getElementById('page-title').textContent = 'Profile';
+        document.getElementById('page-description').textContent = 'Your profile information';
+        updateProfilePage();
+      }
+    }
 
-      const tx = {
-        validUntil: Math.floor(Date.now() / 1000) + 600,
-        messages: [
-          {
-            address: 'UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3',
-            amount: '10000000' // 0.01 TON
-          }
-        ]
-      };
+    // Show daily rewards modal
+    function showDailyRewardsModal() {
+      const modal = document.getElementById('daily-rewards-modal');
+      modal.style.display = 'flex';
+      
+      // Update day status
+      updateDailyRewardsUI();
+    }
 
+    // Close modal
+    function closeModal() {
+      document.getElementById('daily-rewards-modal').style.display = 'none';
+    }
+
+    // Update daily rewards UI
+    function updateDailyRewardsUI() {
+      // Reset all days
+      for (let i = 1; i <= 7; i++) {
+        const dayElement = document.getElementById(`day-${i}`);
+        dayElement.classList.remove('active', 'completed');
+      }
+      
+      // Set completed and active days
+      for (let i = 1; i <= appState.dailyStreak; i++) {
+        if (i <= 7) {
+          document.getElementById(`day-${i}`).classList.add('completed');
+        }
+      }
+      
+      // If streak is less than 7, highlight next day
+      if (appState.dailyStreak < 7) {
+        document.getElementById(`day-${appState.dailyStreak + 1}`).classList.add('active');
+      }
+      
+      // Update countdown
+      updateDailyCountdown();
+    }
+
+    // Update daily countdown
+    function updateDailyCountdown() {
+      const countdownElement = document.getElementById('daily-countdown');
+      
+      if (appState.lastDailyClaim) {
+        const now = new Date();
+        const lastClaim = new Date(appState.lastDailyClaim);
+        const nextClaim = new Date(lastClaim);
+        nextClaim.setDate(nextClaim.getDate() + 1);
+        
+        if (now < nextClaim) {
+          const diff = nextClaim - now;
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          
+          countdownElement.textContent = `Next claim in: ${hours}h ${minutes}m`;
+          return;
+        }
+      }
+      
+      countdownElement.textContent = 'You can claim your daily reward now!';
+    }
+
+    // Claim daily reward
+    function claimDailyReward() {
+      const now = new Date();
+      const today = now.toDateString();
+      
+      // Check if user already claimed today
+      if (appState.lastDailyClaim && new Date(appState.lastDailyClaim).toDateString() === today) {
+        alert('You already claimed your reward today!');
+        return;
+      }
+      
+      // Check if streak is broken (more than 1 day since last claim)
+      if (appState.lastDailyClaim) {
+        const lastClaim = new Date(appState.lastDailyClaim);
+        const diffDays = Math.floor((now - lastClaim) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > 1) {
+          appState.dailyStreak = 0; // Reset streak
+        }
+      }
+      
+      // Increase streak and claim points
+      appState.dailyStreak = (appState.dailyStreak % 7) + 1;
+      const pointsToAdd = appState.dailyStreak * 5;
+      
+      appState.points += pointsToAdd;
+      appState.lastDailyClaim = now;
+      
+      // Save data
+      saveUserData();
+      
+      // Update UI
+      updateUI();
+      updateDailyRewardsUI();
+      
+      // Show success message
+      alert(`Congratulations! You earned ${pointsToAdd} points for day ${appState.dailyStreak} of your streak!`);
+      
+      // Close modal after 2 seconds
+      setTimeout(closeModal, 2000);
+    }
+
+    // Start Telegram task
+    function startTelegramTask(button, taskId) {
+      if (appState.telegramTasks[taskId].completed) {
+        const lastCompleted = new Date(appState.telegramTasks[taskId].lastCompleted);
+        const now = new Date();
+        
+        // Check if 24 hours have passed since last completion
+        if (now - lastCompleted < 24 * 60 * 60 * 1000) {
+          const hoursLeft = 24 - Math.floor((now - lastCompleted) / (1000 * 60 * 60));
+          alert(`You can retry this task in ${hoursLeft} hours`);
+          return;
+        }
+      }
+      
+      // Start countdown
+      let secondsLeft = 7;
+      button.disabled = true;
+      button.textContent = secondsLeft;
+      
+      const progressFill = document.getElementById(`${taskId.replace('task', 'progress')}`);
+      progressFill.style.width = '0%';
+      
+      const countdown = setInterval(() => {
+        secondsLeft--;
+        button.textContent = secondsLeft;
+        progressFill.style.width = `${(7 - secondsLeft) / 7 * 100}%`;
+        
+        if (secondsLeft <= 0) {
+          clearInterval(countdown);
+          completeTelegramTask(button, taskId);
+        }
+      }, 1000);
+    }
+
+    // Complete Telegram task
+    function completeTelegramTask(button, taskId) {
+      button.textContent = 'Claim Points';
+      button.classList.add('completed');
+      
+      // Add points
+      appState.points += 10;
+      appState.telegramTasks[taskId].completed = true;
+      appState.telegramTasks[taskId].lastCompleted = new Date();
+      
+      // Save data
+      saveUserData();
+      
+      // Update UI
+      updateUI();
+      
+      // Show confetti effect
+      showConfetti();
+      
+      // Re-enable button after 24 hours
+      setTimeout(() => {
+        button.disabled = false;
+        button.classList.remove('completed');
+        button.textContent = 'Join Now';
+        document.getElementById(`${taskId.replace('task', 'progress')}`).style.width = '0%';
+      }, 24 * 60 * 60 * 1000);
+    }
+
+    // Buy points with TON
+    async function buyPoints(tonAmount, points) {
+      if (!appState.walletConnected) {
+        alert('You need to connect your wallet first!');
+        return;
+      }
+      
       try {
+        const tx = {
+          validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes
+          messages: [
+            {
+              address: 'UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3', // Replace with your wallet address
+              amount: (tonAmount * 1000000000).toString(), // Convert TON to nanoTON
+            }
+          ]
+        };
+        
         const result = await tonConnectUI.sendTransaction(tx);
-        document.getElementById('status').textContent = `✅ تم الدفع!`;
+        
+        // If transaction succeeds, add points
+        appState.points += points;
+        saveUserData();
+        updateUI();
+        showConfetti();
+        
+        alert(`Transaction successful! You received ${points} points!`);
       } catch (error) {
-        document.getElementById('status').textContent = `❌ فشل الدفع: ${error.message}`;
+        console.error('Transaction failed:', error);
+        alert('Transaction failed: ' + error.message);
+      }
+    }
+
+    // Update UI
+    function updateUI() {
+      document.getElementById('user-points').textContent = appState.points.toLocaleString();
+      document.getElementById('profile-points-value').textContent = appState.points.toLocaleString();
+      
+      // Update progress bar
+      const currentTier = getCurrentTier();
+      const nextTier = tierSystem[tierSystem.indexOf(currentTier) + 1] || currentTier;
+      
+      const progressPercent = nextTier ? 
+        Math.min(100, ((appState.points - currentTier.minPoints) / (nextTier.minPoints - currentTier.minPoints)) * 100) :
+        100;
+      
+      document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+      document.getElementById('progress-percent').textContent = `${Math.round(progressPercent)}%`;
+      
+      // Update rank
+      updateRank();
+      
+      // Update tier badge
+      updateTierBadge();
+    }
+
+    // Get current tier based on points
+    function getCurrentTier() {
+      return tierSystem.find(tier => 
+        appState.points >= tier.minPoints && appState.points <= tier.maxPoints
+      ) || tierSystem[0];
+    }
+
+    // Update tier badge
+    function updateTierBadge() {
+      const currentTier = getCurrentTier();
+      const badgeElement = document.getElementById('rank-badge');
+      const profileTierElement = document.getElementById('profile-tier');
+      
+      badgeElement.textContent = currentTier.name;
+      badgeElement.className = `rank-badge ${currentTier.class}`;
+      
+      if (profileTierElement) {
+        profileTierElement.textContent = currentTier.name;
+        profileTierElement.className = `profile-tier ${currentTier.class}`;
+      }
+    }
+
+    // Update rank based on points
+    function updateRank() {
+      if (appState.points >= 900) {
+        // Improve rank based on points
+        if (appState.points >= 10000) {
+          appState.rank = "#1";
+        } else if (appState.points >= 5000) {
+          appState.rank = "#5";
+        } else if (appState.points >= 2000) {
+          appState.rank = "#10";
+        } else if (appState.points >= 1500) {
+          appState.rank = "#25";
+        } else if (appState.points >= 900) {
+          appState.rank = "#50";
+        }
+      } else {
+        appState.rank = "+100K";
+      }
+      
+      document.getElementById('user-rank').textContent = appState.rank;
+      document.getElementById('profile-rank-value').textContent = appState.rank;
+    }
+
+    // Show confetti effect
+    function showConfetti() {
+      const colors = ['#6e8efb', '#a777e3', '#ff6b6b', '#4CAF50', '#FFC107'];
+      
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = `${Math.random() * 100}%`;
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = `${Math.random() * 10 + 5}px`;
+        confetti.style.height = `${Math.random() * 10 + 5}px`;
+        confetti.style.animationDuration = `${Math.random() * 2 + 2}s`;
+        
+        document.body.appendChild(confetti);
+        
+        // Remove element after animation
+        setTimeout(() => {
+          confetti.remove();
+        }, 3000);
+      }
+    }
+
+    // Update profile page
+    function updateProfilePage() {
+      const avatarElement = document.getElementById('profile-avatar');
+      const usernameElement = document.getElementById('profile-username');
+      
+      if (appState.telegramUser) {
+        const name = appState.telegramUser.username || appState.telegramUser.first_name || "User";
+        const initials = name.substring(0, 2).toUpperCase();
+        
+        avatarElement.innerText = initials;
+        usernameElement.innerText = name;
+      } else {
+        avatarElement.innerText = "??";
+        usernameElement.innerText = "Unknown";
+      }
+    }
+
+    // Load user data
+    function loadUserData(walletAddress) {
+      // In a real app, you would fetch this from your server
+      console.log(`Loading user data for wallet: ${walletAddress}`);
+      
+      // Check for saved data in localStorage
+      const savedData = localStorage.getItem(`userData_${walletAddress}`);
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        appState.points = data.points || 0;
+        appState.rank = data.rank || "+100K";
+        appState.tasksCompleted = data.tasksCompleted || [];
+        appState.dailyStreak = data.dailyStreak || 0;
+        appState.lastDailyClaim = data.lastDailyClaim ? new Date(data.lastDailyClaim) : null;
+        appState.telegramTasks = data.telegramTasks || {
+          'telegram-task-1': { completed: false, lastCompleted: null },
+          'telegram-task-2': { completed: false, lastCompleted: null }
+        };
+        appState.telegramUser = data.telegramUser || null;
+      } else {
+        // Default data for new user
+        appState.points = 0;
+        appState.rank = "+100K";
+        appState.tasksCompleted = [];
+        appState.dailyStreak = 0;
+        appState.lastDailyClaim = null;
+        appState.telegramTasks = {
+          'telegram-task-1': { completed: false, lastCompleted: null },
+          'telegram-task-2': { completed: false, lastCompleted: null }
+        };
+        
+        // Try to get Telegram user data
+        try {
+          const tg = window.Telegram?.WebApp;
+          if (tg) {
+            appState.telegramUser = tg.initDataUnsafe?.user || null;
+          }
+        } catch (e) {
+          console.log('Not running in Telegram WebApp');
+        }
+      }
+      
+      updateUI();
+      
+      // Update task buttons
+      updateTaskButtons();
+      
+      // Update Telegram tasks
+      updateTelegramTasks();
+    }
+
+    // Save user data
+    function saveUserData() {
+      // In a real app, you would send this to your server
+      const wallet = tonConnectUI.account;
+      if (wallet) {
+        localStorage.setItem(`userData_${wallet.address}`, JSON.stringify({
+          points: appState.points,
+          rank: appState.rank,
+          tasksCompleted: appState.tasksCompleted,
+          dailyStreak: appState.dailyStreak,
+          lastDailyClaim: appState.lastDailyClaim,
+          telegramTasks: appState.telegramTasks,
+          telegramUser: appState.telegramUser
+        }));
+      }
+    }
+
+    // Update task buttons
+    function updateTaskButtons() {
+      const buttons = document.querySelectorAll('.task-button');
+      buttons.forEach(button => {
+        const points = parseInt(button.getAttribute('data-points'));
+        if (appState.tasksCompleted.includes(points)) {
+          button.classList.add('completed');
+          button.textContent = 'Completed';
+        }
+      });
+    }
+
+    // Update Telegram tasks status
+    function updateTelegramTasks() {
+      for (const taskId in appState.telegramTasks) {
+        const task = appState.telegramTasks[taskId];
+        const button = document.getElementById(taskId);
+        
+        if (task.completed) {
+          const lastCompleted = new Date(task.lastCompleted);
+          const now = new Date();
+          
+          if (now - lastCompleted < 24 * 60 * 60 * 1000) {
+            // Less than 24 hours since completion
+            button.classList.add('completed');
+            button.textContent = 'Claim Points';
+            
+            // Calculate time left
+            const hoursLeft = 24 - Math.floor((now - lastCompleted) / (1000 * 60 * 60));
+            setTimeout(() => {
+              button.classList.remove('completed');
+              button.textContent = 'Join Now';
+              document.getElementById(`${taskId.replace('task', 'progress')}`).style.width = '0%';
+            }, (24 * 60 * 60 * 1000) - (now - lastCompleted));
+          } else {
+            // 24 hours passed, can retry
+            button.classList.remove('completed');
+            button.textContent = 'Join Now';
+            document.getElementById(`${taskId.replace('task', 'progress')}`).style.width = '0%';
+          }
+        }
+      }
+    }
+
+    // Initialize app when loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load initial data
+      if (tonConnectUI.account) {
+        loadUserData(tonConnectUI.account.address);
       }
     });
   </script>
