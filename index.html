@@ -381,14 +381,15 @@
       color: var(--text-muted);
       background: none;
       border: none;
-      font-size: 12px;
+      font-size: 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
       cursor: pointer;
-      padding: 8px 20px;
+      padding: 8px 10px;
       border-radius: 12px;
       transition: all 0.3s;
+      min-width: 60px;
     }
     
     .nav-btn.active {
@@ -398,8 +399,8 @@
     }
     
     .nav-btn i {
-      font-size: 22px;
-      margin-bottom: 5px;
+      font-size: 18px;
+      margin-bottom: 3px;
     }
     
     .status {
@@ -909,6 +910,83 @@
       transform: rotate(15deg);
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
+    
+    /* New Airdrop Page */
+    .airdrop-page {
+      width: 100%;
+      max-width: 350px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .airdrop-page h2 {
+      font-size: 24px;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    .airdrop-description {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+    
+    .airdrop-stats-container {
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .stat-item:last-child {
+      border-bottom: none;
+    }
+    
+    .stat-label {
+      font-size: 15px;
+      color: var(--text-light);
+    }
+    
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--secondary-color);
+    }
+    
+    .verify-button {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: not-allowed;
+      width: 100%;
+      max-width: 200px;
+      margin-top: 20px;
+    }
+    
+    .gw-token-icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 15px;
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -1119,6 +1197,34 @@
           <button class="swap-button" id="swap-button" onclick="swapCoins()">Swap Now</button>
         </div>
       </div>
+      
+      <!-- New Airdrop Page -->
+      <div class="page" id="airdrop-page">
+        <div class="airdrop-page">
+          <img src="https://i.suar.me/NzAB4/l" class="gw-token-icon" alt="GW Token">
+          <h2>GW Token Airdrop</h2>
+          <p class="airdrop-description">
+            GW tokens will be distributed based on your participation in the following activities
+          </p>
+          
+          <div class="airdrop-stats-container">
+            <div class="stat-item">
+              <div class="stat-label">Completed Tasks</div>
+              <div class="stat-value" id="completed-tasks">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Gift Participations</div>
+              <div class="stat-value" id="gift-participations">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">TON Transactions</div>
+              <div class="stat-value" id="ton-transactions">0</div>
+            </div>
+          </div>
+          
+          <button class="verify-button" disabled>Verify</button>
+        </div>
+      </div>
     </div>
     
     <div class="navigation">
@@ -1133,6 +1239,16 @@
       <button class="nav-btn" onclick="switchPage('profile-page')">
         <i class="fas fa-user"></i>
         Profile
+      </button>
+      <!-- New Gift Button -->
+      <button class="nav-btn" id="gift-button">
+        <i class="fas fa-gift"></i>
+        Gift
+      </button>
+      <!-- New Airdrop Button -->
+      <button class="nav-btn" onclick="switchPage('airdrop-page')">
+        <i class="fas fa-parachute-box"></i>
+        Airdrop
       </button>
     </div>
   </div>
@@ -1216,7 +1332,11 @@
       telegramUser: null,
       swapEnabled: false,
       referralsCount: 0,
-      referralEarnings: 0
+      referralEarnings: 0,
+      // New airdrop stats
+      completedTasks: 0,
+      giftParticipations: 0,
+      tonTransactions: 0
     };
 
     // Tier System
@@ -1297,7 +1417,18 @@
         document.getElementById('page-title').textContent = 'Profile';
         document.getElementById('page-description').textContent = 'Your profile information';
         updateProfilePage();
+      } else if (pageId === 'airdrop-page') {
+        document.getElementById('page-title').textContent = 'GW Token Airdrop';
+        document.getElementById('page-description').textContent = 'Token distribution based on your activities';
+        updateAirdropPage();
       }
+    }
+
+    // Update Airdrop page
+    function updateAirdropPage() {
+      document.getElementById('completed-tasks').textContent = appState.completedTasks;
+      document.getElementById('gift-participations').textContent = appState.giftParticipations;
+      document.getElementById('ton-transactions').textContent = appState.tonTransactions;
     }
 
     // Show daily rewards modal
@@ -1408,6 +1539,9 @@
       appState.goldBars += goldBarsToAdd;
       appState.lastDailyClaim = now;
       
+      // Increment completed tasks
+      appState.completedTasks++;
+      
       // Save data
       saveUserData();
       
@@ -1466,6 +1600,7 @@
       
       // Add gold bars
       appState.goldBars += 10;
+      appState.completedTasks++;
       appState.telegramTasks[taskId].completed = true;
       appState.telegramTasks[taskId].lastCompleted = new Date();
       
@@ -1509,6 +1644,7 @@
         
         // If transaction succeeds, add gold bars
         appState.goldBars += goldBars;
+        appState.tonTransactions++;
         saveUserData();
         updateUI();
         showConfetti();
@@ -1613,6 +1749,7 @@
         // If transaction succeeds, perform swap
         const coins = appState.giftCoins;
         appState.giftCoins = 0;
+        appState.tonTransactions++;
         appState.swapEnabled = false;
         
         saveUserData();
@@ -1664,6 +1801,11 @@
       
       // Update referral stats
       updateReferralStats();
+      
+      // Update Airdrop page if active
+      if (document.getElementById('airdrop-page').classList.contains('active')) {
+        updateAirdropPage();
+      }
     }
 
     // Get current tier based on gold bars
@@ -1821,6 +1963,9 @@
         appState.swapEnabled = data.giftCoins > 0 || false;
         appState.referralsCount = data.referralsCount || 0;
         appState.referralEarnings = data.referralEarnings || 0;
+        appState.completedTasks = data.completedTasks || 0;
+        appState.giftParticipations = data.giftParticipations || 0;
+        appState.tonTransactions = data.tonTransactions || 0;
       } else {
         // Default data for new user
         appState.goldBars = 0;
@@ -1836,6 +1981,9 @@
         appState.swapEnabled = false;
         appState.referralsCount = 0;
         appState.referralEarnings = 0;
+        appState.completedTasks = 0;
+        appState.giftParticipations = 0;
+        appState.tonTransactions = 0;
         
         // Try to get Telegram user data
         try {
@@ -1887,7 +2035,10 @@
           telegramTasks: appState.telegramTasks,
           telegramUser: appState.telegramUser,
           referralsCount: appState.referralsCount,
-          referralEarnings: appState.referralEarnings
+          referralEarnings: appState.referralEarnings,
+          completedTasks: appState.completedTasks,
+          giftParticipations: appState.giftParticipations,
+          tonTransactions: appState.tonTransactions
         }));
       }
     }
@@ -1953,6 +2104,11 @@
         } else {
           convertButton.disabled = true;
         }
+      });
+      
+      // Gift button is empty as requested
+      document.getElementById('gift-button').addEventListener('click', function() {
+        // Empty as requested
       });
     });
   </script>
