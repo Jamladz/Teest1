@@ -123,6 +123,9 @@
       height: 200px;
       margin: 15px 0 25px;
       perspective: 1000px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     
     .gift-card {
@@ -133,8 +136,9 @@
       box-shadow: 0 10px 30px rgba(110, 142, 251, 0.3);
       border: 2px solid rgba(110, 142, 251, 0.2);
       transition: transform 0.3s, box-shadow 0.3s;
-      background-size: cover;
+      background-size: contain;
       background-position: center;
+      background-repeat: no-repeat;
       overflow: hidden;
     }
     
@@ -148,42 +152,24 @@
       background: linear-gradient(135deg, rgba(110, 142, 251, 0.1) 0%, rgba(167, 119, 227, 0.1) 100%);
     }
     
+    /* Updated to use the specified image without background */
     .gift-card:nth-child(1) {
       z-index: 5;
       transform: translateY(0) rotateZ(0deg);
-      background-image: url('https://i.suar.me/1AYpd/l');
+      background-image: url('https://i.suar.me/xpLjX/l');
+      background-size: 70%;
+      background-position: center;
     }
     
-    .gift-card:nth-child(2) {
-      z-index: 4;
-      transform: translateY(10px) rotateZ(2deg);
-      background-image: url('https://i.suar.me/0A5lY/l');
-      filter: brightness(0.8);
-      clip-path: inset(0 0 20% 0);
+    .gift-card:nth-child(1)::before {
+      display: none;
     }
     
-    .gift-card:nth-child(3) {
-      z-index: 3;
-      transform: translateY(20px) rotateZ(-2deg);
-      background-image: url('https://i.suar.me/1AYpd/l');
-      filter: brightness(0.7);
-      clip-path: inset(0 0 40% 0);
-    }
-    
-    .gift-card:nth-child(4) {
-      z-index: 2;
-      transform: translateY(30px) rotateZ(1deg);
-      background-image: url('https://i.suar.me/yEWOz/l');
-      filter: brightness(0.6);
-      clip-path: inset(0 0 60% 0);
-    }
-    
+    .gift-card:nth-child(2),
+    .gift-card:nth-child(3),
+    .gift-card:nth-child(4),
     .gift-card:nth-child(5) {
-      z-index: 1;
-      transform: translateY(40px) rotateZ(-1deg);
-      background-image: url('https://i.suar.me/1AYpd/l');
-      filter: brightness(0.5);
-      clip-path: inset(0 0 80% 0);
+      display: none;
     }
     
     .leaderboard {
@@ -1608,7 +1594,6 @@
         appState.rank = "+100K";
       }
       
-      document.getElementById('user-rank').textContent = appState.rank;
       document.getElementById('profile-rank-value').textContent = appState.rank;
     }
 
