@@ -6,6 +6,7 @@
   <title>Gift Winner</title>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
     :root {
       --primary-color: #6e8efb;
@@ -966,6 +967,9 @@
       font-size: 18px;
       font-weight: 700;
       color: var(--secondary-color);
+      min-width: 50px;
+      display: flex;
+      justify-content: flex-end;
     }
     
     .verify-button {
@@ -986,6 +990,63 @@
       width: 40px;
       height: 40px;
       margin-bottom: 15px;
+    }
+    
+    /* New styles for Adsgram integration */
+    #videoScreen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: black;
+      z-index: 9999;
+    }
+    
+    #videoScreen iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    #closeBtn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      border: none;
+      font-size: 28px;
+      padding: 5px 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 10000;
+    }
+    
+    #closeBtn:hover {
+      background-color: rgba(255, 0, 0, 0.8);
+    }
+    
+    /* Loading spinner for airdrop stats */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* New task styles */
+    .adsgram-task {
+      background: rgba(110, 142, 251, 0.1);
+      border: 1px solid var(--primary-color);
     }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -1094,14 +1155,14 @@
         <div class="tasks-container">
           <h2 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">Available Tasks</h2>
           
-          <!-- Daily Login Task -->
-          <div class="task-item" onclick="showDailyRewardsModal()">
+          <!-- Adsgram Ad Task -->
+          <div class="task-item adsgram-task">
             <div class="task-info">
-              <div class="task-title">Daily Login</div>
-              <div class="task-description">Login for 7 consecutive days for rewards</div>
+              <div class="task-title">Watch Adsgram Ad</div>
+              <div class="task-description">Watch an ad to earn 20 gold bars</div>
             </div>
-            <div class="task-points"><i class="fas fa-coins gold-bar-icon"></i> +5 to +35</div>
-            <button class="task-button" id="daily-login-btn">Rewards</button>
+            <div class="task-points"><i class="fas fa-coins gold-bar-icon"></i> +20</div>
+            <button class="task-button" id="adsgram-task-btn">Watch Now</button>
           </div>
           
           <!-- Telegram Tasks -->
@@ -1210,15 +1271,27 @@
           <div class="airdrop-stats-container">
             <div class="stat-item">
               <div class="stat-label">Completed Tasks</div>
-              <div class="stat-value" id="completed-tasks">0</div>
+              <div class="stat-value" id="completed-tasks">
+                <div class="spinner"></div>
+              </div>
             </div>
             <div class="stat-item">
               <div class="stat-label">Gift Participations</div>
-              <div class="stat-value" id="gift-participations">0</div>
+              <div class="stat-value" id="gift-participations">
+                <div class="spinner"></div>
+              </div>
             </div>
             <div class="stat-item">
               <div class="stat-label">TON Transactions</div>
-              <div class="stat-value" id="ton-transactions">0</div>
+              <div class="stat-value" id="ton-transactions">
+                <div class="spinner"></div>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">GW Tokens</div>
+              <div class="stat-value" id="gw-tokens">
+                <div class="spinner"></div>
+              </div>
             </div>
           </div>
           
@@ -1253,47 +1326,10 @@
     </div>
   </div>
   
-  <!-- Daily Rewards Modal -->
-  <div class="modal" id="daily-rewards-modal">
-    <div class="modal-content">
-      <div class="modal-title">Daily Rewards</div>
-      <p>Login daily to get extra gold bars!</p>
-      
-      <div class="daily-rewards">
-        <div class="day-reward" id="day-1">
-          <div class="day-number">Day 1</div>
-          <div class="day-points"><i class="fas fa-coins gold-bar-icon"></i> +5</div>
-        </div>
-        <div class="day-reward" id="day-2">
-          <div class="day-number">Day 2</div>
-          <div class="day-points"><i class="fas fa-coins gold-bar-icon"></i> +10</div>
-        </div>
-        <div class="day-reward" id="day-3">
-          <div class="day-number">Day 3</div>
-          <div class="day-points"><i class="fas fa-coins gold-bar-icon"></i> +15</div>
-        </div>
-        <div class="day-reward" id="day-4">
-          <div class="day-number">Day 4</div>
-          <div class="day-points"><i class="fas fa-coins gold-bar-icon"></i> +20</div>
-        </div>
-        <div class="day-reward" id="day-5">
-          <div class="day-number">Day 5</div>
-          <div class="day-points"><i class="fas fa-coins gold-bar-icon"></i> +25</div>
-        </div>
-        <div class="day-reward" id="day-6">
-          <div class="day-number">Day 6</div>
-          <div class="day-points"><i class="fas fa-coins gold-bar-icon"></i> +30</div>
-        </div>
-        <div class="day-reward" id="day-7">
-          <div class="day-number">Day 7</div>
-          <div class="day-points"><i class="fas fa-coins gold-bar-icon"></i> +35</div>
-        </div>
-      </div>
-      
-      <div class="countdown" id="daily-countdown"></div>
-      <button class="close-modal" onclick="claimDailyReward()">Claim Reward</button>
-      <button class="close-modal" onclick="closeModal()" style="background: var(--card-bg); margin-top: 10px;">Close</button>
-    </div>
+  <!-- Adsgram Ad Player -->
+  <div id="videoScreen">
+    <button id="closeBtn">✕</button>
+    <iframe src="" allowfullscreen></iframe>
   </div>
   
   <!-- Convert Modal -->
@@ -1328,6 +1364,7 @@
         'telegram-task-1': { completed: false, lastCompleted: null },
         'telegram-task-2': { completed: false, lastCompleted: null }
       },
+      adsgramTask: { completed: false, lastCompleted: null },
       walletConnected: false,
       telegramUser: null,
       swapEnabled: false,
@@ -1336,7 +1373,9 @@
       // New airdrop stats
       completedTasks: 0,
       giftParticipations: 0,
-      tonTransactions: 0
+      tonTransactions: 0,
+      gwTokens: 0,
+      isNewUser: true
     };
 
     // Tier System
@@ -1358,6 +1397,11 @@
       { name: "Diamond III", minPoints: 5000000, maxPoints: 9999999, class: "diamond" },
       { name: "Legend", minPoints: 10000000, maxPoints: Infinity, class: "diamond" }
     ];
+
+    // DOM Elements
+    const videoScreen = document.getElementById("videoScreen");
+    const closeBtn = document.getElementById("closeBtn");
+    const adsgramTaskBtn = document.getElementById("adsgram-task-btn");
 
     // Initialize TonConnect
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
@@ -1426,140 +1470,23 @@
 
     // Update Airdrop page
     function updateAirdropPage() {
-      document.getElementById('completed-tasks').textContent = appState.completedTasks;
-      document.getElementById('gift-participations').textContent = appState.giftParticipations;
-      document.getElementById('ton-transactions').textContent = appState.tonTransactions;
+      setTimeout(() => {
+        document.getElementById('completed-tasks').textContent = appState.completedTasks;
+        document.getElementById('gift-participations').textContent = appState.giftParticipations;
+        document.getElementById('ton-transactions').textContent = appState.tonTransactions;
+        document.getElementById('gw-tokens').textContent = appState.gwTokens;
+      }, 1000);
     }
 
-    // Show daily rewards modal
-    function showDailyRewardsModal() {
-      const modal = document.getElementById('daily-rewards-modal');
-      modal.style.display = 'flex';
-      
-      // Update day status
-      updateDailyRewardsUI();
-    }
-    
-    // Show convert modal
-    function showConvertModal() {
-      const modal = document.getElementById('convert-modal');
-      modal.style.display = 'flex';
-      
-      // Reset input
-      document.getElementById('modal-convert-amount').value = '';
-      document.getElementById('convert-result').textContent = 'You will receive: 0 coins';
-      
-      // Add event listener for input changes
-      document.getElementById('modal-convert-amount').addEventListener('input', function() {
-        const goldBars = parseInt(this.value) || 0;
-        const coins = Math.floor(goldBars / 1000);
-        document.getElementById('convert-result').textContent = `You will receive: ${coins} coins`;
-      });
-    }
+    // Adsgram Ad Player
+    closeBtn.addEventListener("click", () => {
+      videoScreen.style.display = "none";
+    });
 
-    // Close modal
-    function closeModal() {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.style.display = 'none';
-      });
-    }
-
-    // Update daily rewards UI
-    function updateDailyRewardsUI() {
-      // Reset all days
-      for (let i = 1; i <= 7; i++) {
-        const dayElement = document.getElementById(`day-${i}`);
-        dayElement.classList.remove('active', 'completed');
-      }
-      
-      // Set completed and active days
-      for (let i = 1; i <= appState.dailyStreak; i++) {
-        if (i <= 7) {
-          document.getElementById(`day-${i}`).classList.add('completed');
-        }
-      }
-      
-      // If streak is less than 7, highlight next day
-      if (appState.dailyStreak < 7) {
-        document.getElementById(`day-${appState.dailyStreak + 1}`).classList.add('active');
-      }
-      
-      // Update countdown
-      updateDailyCountdown();
-    }
-
-    // Update daily countdown
-    function updateDailyCountdown() {
-      const countdownElement = document.getElementById('daily-countdown');
-      
-      if (appState.lastDailyClaim) {
-        const now = new Date();
-        const lastClaim = new Date(appState.lastDailyClaim);
-        const nextClaim = new Date(lastClaim);
-        nextClaim.setDate(nextClaim.getDate() + 1);
-        
-        if (now < nextClaim) {
-          const diff = nextClaim - now;
-          const hours = Math.floor(diff / (1000 * 60 * 60));
-          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          
-          countdownElement.textContent = `Next claim in: ${hours}h ${minutes}m`;
-          return;
-        }
-      }
-      
-      countdownElement.textContent = 'You can claim your daily reward now!';
-    }
-
-    // Claim daily reward
-    function claimDailyReward() {
-      const now = new Date();
-      const today = now.toDateString();
-      
-      // Check if user already claimed today
-      if (appState.lastDailyClaim && new Date(appState.lastDailyClaim).toDateString() === today) {
-        alert('You already claimed your reward today!');
-        return;
-      }
-      
-      // Check if streak is broken (more than 1 day since last claim)
-      if (appState.lastDailyClaim) {
-        const lastClaim = new Date(appState.lastDailyClaim);
-        const diffDays = Math.floor((now - lastClaim) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays > 1) {
-          appState.dailyStreak = 0; // Reset streak
-        }
-      }
-      
-      // Increase streak and claim points
-      appState.dailyStreak = (appState.dailyStreak % 7) + 1;
-      const goldBarsToAdd = appState.dailyStreak * 5;
-      
-      appState.goldBars += goldBarsToAdd;
-      appState.lastDailyClaim = now;
-      
-      // Increment completed tasks
-      appState.completedTasks++;
-      
-      // Save data
-      saveUserData();
-      
-      // Update UI
-      updateUI();
-      updateDailyRewardsUI();
-      
-      // Show success message
-      alert(`Congratulations! You earned ${goldBarsToAdd} gold bars for day ${appState.dailyStreak} of your streak!`);
-      
-      // Close modal after 2 seconds
-      setTimeout(closeModal, 2000);
-    }
-
-    // Start Telegram task
-    function startTelegramTask(button, taskId, url) {
-      if (appState.telegramTasks[taskId].completed) {
-        const lastCompleted = new Date(appState.telegramTasks[taskId].lastCompleted);
+    // Adsgram Ad Task
+    adsgramTaskBtn.addEventListener("click", async () => {
+      if (appState.adsgramTask.completed) {
+        const lastCompleted = new Date(appState.adsgramTask.lastCompleted);
         const now = new Date();
         
         // Check if 24 hours have passed since last completion
@@ -1570,57 +1497,36 @@
         }
       }
       
-      // Open Telegram URL in new tab
-      window.open(url, '_blank');
-      
-      // Start countdown
-      let secondsLeft = 7;
-      button.disabled = true;
-      button.textContent = secondsLeft;
-      
-      const progressFill = document.getElementById(`${taskId.replace('task', 'progress')}`);
-      progressFill.style.width = '0%';
-      
-      const countdown = setInterval(() => {
-        secondsLeft--;
-        button.textContent = secondsLeft;
-        progressFill.style.width = `${(7 - secondsLeft) / 7 * 100}%`;
+      try {
+        adsgramTaskBtn.disabled = true;
+        adsgramTaskBtn.textContent = "Loading...";
         
-        if (secondsLeft <= 0) {
-          clearInterval(countdown);
-          completeTelegramTask(button, taskId);
-        }
-      }, 1000);
-    }
-
-    // Complete Telegram task
-    function completeTelegramTask(button, taskId) {
-      button.textContent = 'Claim Gold Bars';
-      button.classList.add('completed');
-      
-      // Add gold bars
-      appState.goldBars += 10;
-      appState.completedTasks++;
-      appState.telegramTasks[taskId].completed = true;
-      appState.telegramTasks[taskId].lastCompleted = new Date();
-      
-      // Save data
-      saveUserData();
-      
-      // Update UI
-      updateUI();
-      
-      // Show confetti effect
-      showConfetti();
-      
-      // Re-enable button after 24 hours
-      setTimeout(() => {
-        button.disabled = false;
-        button.classList.remove('completed');
-        button.textContent = 'Join Now';
-        document.getElementById(`${taskId.replace('task', 'progress')}`).style.width = '0%';
-      }, 24 * 60 * 60 * 1000);
-    }
+        await window.Adsgram.init({ blockId: "int-12435" }).show();
+        
+        // Ad completed successfully
+        appState.goldBars += 20;
+        appState.completedTasks++;
+        appState.adsgramTask.completed = true;
+        appState.adsgramTask.lastCompleted = new Date();
+        
+        saveUserData();
+        updateUI();
+        showConfetti();
+        
+        adsgramTaskBtn.textContent = "Completed";
+        setTimeout(() => {
+          adsgramTaskBtn.textContent = "Watch Now";
+          adsgramTaskBtn.disabled = false;
+        }, 2000);
+        
+        alert("Thank you for watching the ad! You earned 20 gold bars!");
+      } catch (error) {
+        console.error("Ad failed to play:", error);
+        alert("Failed to play ad. Please try again later.");
+        adsgramTaskBtn.textContent = "Watch Now";
+        adsgramTaskBtn.disabled = false;
+      }
+    });
 
     // Buy gold bars with TON
     async function buyPoints(tonAmount, goldBars) {
@@ -1689,6 +1595,22 @@
     }
     
     // Show convert modal and confirm conversion
+    function showConvertModal() {
+      const modal = document.getElementById('convert-modal');
+      modal.style.display = 'flex';
+      
+      // Reset input
+      document.getElementById('modal-convert-amount').value = '';
+      document.getElementById('convert-result').textContent = 'You will receive: 0 coins';
+      
+      // Add event listener for input changes
+      document.getElementById('modal-convert-amount').addEventListener('input', function() {
+        const goldBars = parseInt(this.value) || 0;
+        const coins = Math.floor(goldBars / 1000);
+        document.getElementById('convert-result').textContent = `You will receive: ${coins} coins`;
+      });
+    }
+    
     function confirmConvert() {
       const amount = parseInt(document.getElementById('modal-convert-amount').value);
       
@@ -1959,6 +1881,7 @@
           'telegram-task-1': { completed: false, lastCompleted: null },
           'telegram-task-2': { completed: false, lastCompleted: null }
         };
+        appState.adsgramTask = data.adsgramTask || { completed: false, lastCompleted: null };
         appState.telegramUser = data.telegramUser || null;
         appState.swapEnabled = data.giftCoins > 0 || false;
         appState.referralsCount = data.referralsCount || 0;
@@ -1966,10 +1889,12 @@
         appState.completedTasks = data.completedTasks || 0;
         appState.giftParticipations = data.giftParticipations || 0;
         appState.tonTransactions = data.tonTransactions || 0;
+        appState.gwTokens = data.gwTokens || 0;
+        appState.isNewUser = false;
       } else {
         // Default data for new user
         appState.goldBars = 0;
-        appState.giftCoins = 0;
+        appState.giftCoins = 30; // Give 30 GW coins to new users
         appState.rank = "+100K";
         appState.tasksCompleted = [];
         appState.dailyStreak = 0;
@@ -1978,12 +1903,15 @@
           'telegram-task-1': { completed: false, lastCompleted: null },
           'telegram-task-2': { completed: false, lastCompleted: null }
         };
+        appState.adsgramTask = { completed: false, lastCompleted: null };
         appState.swapEnabled = false;
         appState.referralsCount = 0;
         appState.referralEarnings = 0;
         appState.completedTasks = 0;
         appState.giftParticipations = 0;
         appState.tonTransactions = 0;
+        appState.gwTokens = 0;
+        appState.isNewUser = true;
         
         // Try to get Telegram user data
         try {
@@ -2004,22 +1932,41 @@
       // Update Telegram tasks
       updateTelegramTasks();
       
+      // Update Adsgram task
+      updateAdsgramTask();
+      
       // Update referral link
       updateReferralLink();
     }
     
-    // Update referral link display
-    function updateReferralLink() {
-      const referralLinkElement = document.getElementById('referral-link');
+    // Update Adsgram task status
+    function updateAdsgramTask() {
+      const task = appState.adsgramTask;
+      const button = adsgramTaskBtn;
       
-      if (appState.walletConnected) {
-        const link = generateReferralLink();
-        referralLinkElement.textContent = link;
-      } else {
-        referralLinkElement.textContent = "Connect wallet to generate your link";
+      if (task.completed) {
+        const lastCompleted = new Date(task.lastCompleted);
+        const now = new Date();
+        
+        if (now - lastCompleted < 24 * 60 * 60 * 1000) {
+          // Less than 24 hours since completion
+          button.classList.add('completed');
+          button.textContent = 'Completed';
+          
+          // Calculate time left
+          const hoursLeft = 24 - Math.floor((now - lastCompleted) / (1000 * 60 * 60));
+          setTimeout(() => {
+            button.classList.remove('completed');
+            button.textContent = 'Watch Now';
+          }, (24 * 60 * 60 * 1000) - (now - lastCompleted));
+        } else {
+          // 24 hours passed, can retry
+          button.classList.remove('completed');
+          button.textContent = 'Watch Now';
+        }
       }
     }
-
+    
     // Save user data
     function saveUserData() {
       // In a real app, you would send this to your server
@@ -2033,12 +1980,14 @@
           dailyStreak: appState.dailyStreak,
           lastDailyClaim: appState.lastDailyClaim,
           telegramTasks: appState.telegramTasks,
+          adsgramTask: appState.adsgramTask,
           telegramUser: appState.telegramUser,
           referralsCount: appState.referralsCount,
           referralEarnings: appState.referralEarnings,
           completedTasks: appState.completedTasks,
           giftParticipations: appState.giftParticipations,
-          tonTransactions: appState.tonTransactions
+          tonTransactions: appState.tonTransactions,
+          gwTokens: appState.gwTokens
         }));
       }
     }
@@ -2053,38 +2002,6 @@
           button.textContent = 'Completed';
         }
       });
-    }
-
-    // Update Telegram tasks status
-    function updateTelegramTasks() {
-      for (const taskId in appState.telegramTasks) {
-        const task = appState.telegramTasks[taskId];
-        const button = document.getElementById(taskId);
-        
-        if (task.completed) {
-          const lastCompleted = new Date(task.lastCompleted);
-          const now = new Date();
-          
-          if (now - lastCompleted < 24 * 60 * 60 * 1000) {
-            // Less than 24 hours since completion
-            button.classList.add('completed');
-            button.textContent = 'Claim Gold Bars';
-            
-            // Calculate time left
-            const hoursLeft = 24 - Math.floor((now - lastCompleted) / (1000 * 60 * 60));
-            setTimeout(() => {
-              button.classList.remove('completed');
-              button.textContent = 'Join Now';
-              document.getElementById(`${taskId.replace('task', 'progress')}`).style.width = '0%';
-            }, (24 * 60 * 60 * 1000) - (now - lastCompleted));
-          } else {
-            // 24 hours passed, can retry
-            button.classList.remove('completed');
-            button.textContent = 'Join Now';
-            document.getElementById(`${taskId.replace('task', 'progress')}`).style.width = '0%';
-          }
-        }
-      }
     }
 
     // Initialize app when loaded
@@ -2111,6 +2028,72 @@
         // Empty as requested
       });
     });
+    
+    // Start Telegram task
+    function startTelegramTask(button, taskId, url) {
+      if (appState.telegramTasks[taskId].completed) {
+        const lastCompleted = new Date(appState.telegramTasks[taskId].lastCompleted);
+        const now = new Date();
+        
+        // Check if 24 hours have passed since last completion
+        if (now - lastCompleted < 24 * 60 * 60 * 1000) {
+          const hoursLeft = 24 - Math.floor((now - lastCompleted) / (1000 * 60 * 60));
+          alert(`You can retry this task in ${hoursLeft} hours`);
+          return;
+        }
+      }
+      
+      // Open Telegram URL in new tab
+      window.open(url, '_blank');
+      
+      // Start countdown
+      let secondsLeft = 7;
+      button.disabled = true;
+      button.textContent = secondsLeft;
+      
+      const progressFill = document.getElementById(`${taskId.replace('task', 'progress')}`);
+      progressFill.style.width = '0%';
+      
+      const countdown = setInterval(() => {
+        secondsLeft--;
+        button.textContent = secondsLeft;
+        progressFill.style.width = `${(7 - secondsLeft) / 7 * 100}%`;
+        
+        if (secondsLeft <= 0) {
+          clearInterval(countdown);
+          completeTelegramTask(button, taskId);
+        }
+      }, 1000);
+    }
+
+    // Complete Telegram task
+    function completeTelegramTask(button, taskId) {
+      button.textContent = 'Claim Gold Bars';
+      button.classList.add('completed');
+      
+      // Add gold bars
+      appState.goldBars += 10;
+      appState.completedTasks++;
+      appState.telegramTasks[taskId].completed = true;
+      appState.telegramTasks[taskId].lastCompleted = new Date();
+      
+      // Save data
+      saveUserData();
+      
+      // Update UI
+      updateUI();
+      
+      // Show confetti effect
+      showConfetti();
+      
+      // Re-enable button after 24 hours
+      setTimeout(() => {
+        button.disabled = false;
+        button.classList.remove('completed');
+        button.textContent = 'Join Now';
+        document.getElementById(`${taskId.replace('task', 'progress')}`).style.width = '0%';
+      }, 24 * 60 * 60 * 1000);
+    }
   </script>
 </body>
 </html>
