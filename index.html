@@ -8,7 +8,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
-    /* أضفنا أنماط جديدة للصفحات الجديدة */
+    /* أنماط جديدة للصفحات الجديدة */
     .gift-page {
       width: 100%;
       max-width: 350px;
@@ -70,10 +70,11 @@
       background: rgba(110, 142, 251, 0.1);
     }
     
-    .gift-icon {
+    .gift-icon, .ton-icon {
       width: 20px;
       height: 20px;
       margin-right: 5px;
+      vertical-align: middle;
     }
     
     .gift-winners {
@@ -1449,7 +1450,7 @@
                 <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 200 Gift Coins
               </div>
               <div class="price-option">
-                <i class="fab fa-bitcoin"></i> 1 TON
+                <img src="https://ton.org/download/ton_symbol.png" class="ton-icon"> 1 TON
               </div>
             </div>
             <div class="gift-winners">2 Winners</div>
@@ -1477,7 +1478,7 @@
                 <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 100 Gift Coins
               </div>
               <div class="price-option">
-                <i class="fab fa-bitcoin"></i> 0.5 TON
+                <img src="https://ton.org/download/ton_symbol.png" class="ton-icon"> 0.5 TON
               </div>
             </div>
             <div class="gift-winners">5 Winners</div>
@@ -1505,7 +1506,7 @@
                 <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 50 Gift Coins
               </div>
               <div class="price-option">
-                <i class="fab fa-bitcoin"></i> 0.05 TON
+                <img src="https://ton.org/download/ton_symbol.png" class="ton-icon"> 0.05 TON
               </div>
             </div>
             <div class="gift-winners">Multiple Winners</div>
@@ -1588,7 +1589,7 @@
           <span id="coins-amount">0</span> Gift Coins
         </div>
         <div class="price-option" id="ton-option" style="cursor: pointer;" onclick="selectPaymentMethod('ton')">
-          <i class="fab fa-bitcoin"></i> 
+          <img src="https://ton.org/download/ton_symbol.png" class="ton-icon"> 
           <span id="ton-amount">0</span> TON
         </div>
       </div>
@@ -1785,12 +1786,7 @@
       }, 1000);
     }
 
-    // Adsgram Ad Player
-    closeBtn.addEventListener("click", () => {
-      videoScreen.style.display = "none";
-    });
-
-    // Adsgram Ad Task - Modified to allow every 20 seconds
+    // Adsgram Ad Player - Modified to allow every 20 seconds
     adsgramTaskBtn.addEventListener("click", async () => {
       if (appState.adsgramTask.completed) {
         const lastCompleted = new Date(appState.adsgramTask.lastCompleted);
