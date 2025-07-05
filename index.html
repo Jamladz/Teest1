@@ -8,6 +8,146 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
+    /* أضفنا أنماط جديدة للصفحات الجديدة */
+    .gift-page {
+      width: 100%;
+      max-width: 350px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .gift-item {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 20px;
+      width: 100%;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .gift-image-container {
+      width: 100%;
+      height: 180px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 15px;
+      border-radius: 15px;
+      overflow: hidden;
+      background: rgba(0,0,0,0.2);
+    }
+    
+    .gift-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    
+    .gift-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    
+    .gift-price {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .price-option {
+      display: flex;
+      align-items: center;
+      padding: 8px 15px;
+      border-radius: 20px;
+      background: rgba(110, 142, 251, 0.1);
+    }
+    
+    .gift-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+    }
+    
+    .gift-winners {
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 15px;
+    }
+    
+    .gift-progress-container {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    
+    .gift-progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .gift-progress-bar {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    .gift-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      border-radius: 5px;
+    }
+    
+    .gift-button {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .gift-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(110, 142, 251, 0.4);
+    }
+    
+    .gift-button.disabled {
+      background: rgba(255, 255, 255, 0.1);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    .gift-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+      color: white;
+      font-weight: bold;
+      padding: 3px 10px;
+      font-size: 12px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* تعديلات أخرى للتصميم العام */
     :root {
       --primary-color: #6e8efb;
       --secondary-color: #a777e3;
@@ -118,7 +258,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
     
-    /* Updated gift container */
     .gift-container {
       width: 100%;
       max-width: 320px;
@@ -605,7 +744,6 @@
       margin-left: 5px;
     }
     
-    /* New styles for gold bars and airdrop */
     .gold-bar-icon {
       color: var(--gold-bar);
       margin-right: 5px;
@@ -799,7 +937,6 @@
       cursor: not-allowed;
     }
     
-    /* Referral Section */
     .referral-section {
       background: var(--card-bg);
       border-radius: 20px;
@@ -912,7 +1049,6 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
     
-    /* New Airdrop Page */
     .airdrop-page {
       width: 100%;
       max-width: 350px;
@@ -992,7 +1128,6 @@
       margin-bottom: 15px;
     }
     
-    /* New styles for Adsgram integration */
     #videoScreen {
       display: none;
       position: fixed;
@@ -1028,7 +1163,6 @@
       background-color: rgba(255, 0, 0, 0.8);
     }
     
-    /* Loading spinner for airdrop stats */
     .spinner {
       display: inline-block;
       width: 20px;
@@ -1043,7 +1177,6 @@
       to { transform: rotate(360deg); }
     }
     
-    /* New task styles */
     .adsgram-task {
       background: rgba(110, 142, 251, 0.1);
       border: 1px solid var(--primary-color);
@@ -1068,7 +1201,6 @@
     <div class="main-content">
       <!-- Home Page -->
       <div class="page active" id="home-page">
-        <!-- Updated gift container without frame -->
         <div class="gift-container">
           <div class="gift-image"></div>
         </div>
@@ -1159,7 +1291,7 @@
           <div class="task-item adsgram-task">
             <div class="task-info">
               <div class="task-title">Watch Adsgram Ad</div>
-              <div class="task-description">Watch an ad to earn 20 gold bars</div>
+              <div class="task-description">Watch an ad to earn 20 gold bars (every 20 seconds)</div>
             </div>
             <div class="task-points"><i class="fas fa-coins gold-bar-icon"></i> +20</div>
             <button class="task-button" id="adsgram-task-btn">Watch Now</button>
@@ -1298,6 +1430,98 @@
           <button class="verify-button" disabled>Verify</button>
         </div>
       </div>
+      
+      <!-- New Gift Page -->
+      <div class="page" id="gift-page">
+        <div class="gift-page">
+          <h2>Gift Subscriptions</h2>
+          <p class="airdrop-description">Participate in our gifts and win amazing prizes!</p>
+          
+          <!-- Gift 1 -->
+          <div class="gift-item">
+            <div class="gift-badge">First Gift</div>
+            <div class="gift-image-container">
+              <img src="https://i.suar.me/ppxx4/l" class="gift-image" alt="First Gift">
+            </div>
+            <div class="gift-title">Premium Gift Box</div>
+            <div class="gift-price">
+              <div class="price-option">
+                <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 200 Gift Coins
+              </div>
+              <div class="price-option">
+                <i class="fab fa-bitcoin"></i> 1 TON
+              </div>
+            </div>
+            <div class="gift-winners">2 Winners</div>
+            <div class="gift-progress-container">
+              <div class="gift-progress-label">
+                <span>Participants</span>
+                <span id="gift1-participants">2453/3000</span>
+              </div>
+              <div class="gift-progress-bar">
+                <div class="gift-progress-fill" style="width: 81.8%"></div>
+              </div>
+            </div>
+            <button class="gift-button" onclick="subscribeToGift(1)">Subscribe Now</button>
+          </div>
+          
+          <!-- Gift 2 -->
+          <div class="gift-item">
+            <div class="gift-badge">Second Gift</div>
+            <div class="gift-image-container">
+              <img src="https://i.suar.me/XvAA5/l" class="gift-image" alt="Second Gift">
+            </div>
+            <div class="gift-title">Special NFT</div>
+            <div class="gift-price">
+              <div class="price-option">
+                <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 100 Gift Coins
+              </div>
+              <div class="price-option">
+                <i class="fab fa-bitcoin"></i> 0.5 TON
+              </div>
+            </div>
+            <div class="gift-winners">5 Winners</div>
+            <div class="gift-progress-container">
+              <div class="gift-progress-label">
+                <span>Participants</span>
+                <span id="gift2-participants">3487/10000</span>
+              </div>
+              <div class="gift-progress-bar">
+                <div class="gift-progress-fill" style="width: 34.9%"></div>
+              </div>
+            </div>
+            <button class="gift-button" onclick="subscribeToGift(2)">Subscribe Now</button>
+          </div>
+          
+          <!-- Gift 3 -->
+          <div class="gift-item">
+            <div class="gift-badge">Third Gift</div>
+            <div class="gift-image-container">
+              <img src="https://i.suar.me/5L11K/l" class="gift-image" alt="Third Gift">
+            </div>
+            <div class="gift-title">Exclusive Token</div>
+            <div class="gift-price">
+              <div class="price-option">
+                <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 50 Gift Coins
+              </div>
+              <div class="price-option">
+                <i class="fab fa-bitcoin"></i> 0.05 TON
+              </div>
+            </div>
+            <div class="gift-winners">Multiple Winners</div>
+            <div class="gift-progress-container">
+              <div class="gift-progress-label">
+                <span>Participants</span>
+                <span id="gift3-participants">37432/50000</span>
+              </div>
+              <div class="gift-progress-bar">
+                <div class="gift-progress-fill" style="width: 74.9%"></div>
+              </div>
+            </div>
+            <button class="gift-button" onclick="subscribeToGift(3)">Subscribe Now</button>
+          </div>
+        </div>
+      </div>
     </div>
     
     <div class="navigation">
@@ -1314,7 +1538,7 @@
         Profile
       </button>
       <!-- New Gift Button -->
-      <button class="nav-btn" id="gift-button">
+      <button class="nav-btn" onclick="switchPage('gift-page')">
         <i class="fas fa-gift"></i>
         Gift
       </button>
@@ -1350,6 +1574,30 @@
     </div>
   </div>
 
+  <!-- Gift Subscription Modal -->
+  <div class="modal" id="gift-modal">
+    <div class="modal-content">
+      <div class="modal-title" id="gift-modal-title">Subscribe to Gift</div>
+      <div class="convert-info" id="gift-modal-description">
+        Choose your payment method for this gift subscription
+      </div>
+      
+      <div class="gift-price" style="justify-content: center; margin: 20px 0;">
+        <div class="price-option" id="coins-option" style="cursor: pointer; border: 2px solid var(--primary-color);" onclick="selectPaymentMethod('coins')">
+          <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 
+          <span id="coins-amount">0</span> Gift Coins
+        </div>
+        <div class="price-option" id="ton-option" style="cursor: pointer;" onclick="selectPaymentMethod('ton')">
+          <i class="fab fa-bitcoin"></i> 
+          <span id="ton-amount">0</span> TON
+        </div>
+      </div>
+      
+      <button class="close-modal" id="confirm-subscription" onclick="confirmSubscription()">Confirm Subscription</button>
+      <button class="close-modal" onclick="closeModal()" style="background: var(--card-bg); margin-top: 10px;">Cancel</button>
+    </div>
+  </div>
+
   <script>
     // App State
     const appState = {
@@ -1375,7 +1623,46 @@
       giftParticipations: 0,
       tonTransactions: 0,
       gwTokens: 0,
-      isNewUser: true
+      isNewUser: true,
+      // Gift subscriptions
+      giftsSubscribed: {
+        1: false,
+        2: false,
+        3: false
+      },
+      currentGiftSelection: null,
+      paymentMethod: null
+    };
+
+    // Gift details
+    const giftDetails = {
+      1: {
+        title: "Premium Gift Box",
+        coinsPrice: 200,
+        tonPrice: 1,
+        winners: 2,
+        participants: 2453,
+        maxParticipants: 3000,
+        image: "https://i.suar.me/ppxx4/l"
+      },
+      2: {
+        title: "Special NFT",
+        coinsPrice: 100,
+        tonPrice: 0.5,
+        winners: 5,
+        participants: 3487,
+        maxParticipants: 10000,
+        image: "https://i.suar.me/XvAA5/l"
+      },
+      3: {
+        title: "Exclusive Token",
+        coinsPrice: 50,
+        tonPrice: 0.05,
+        winners: "Multiple",
+        participants: 37432,
+        maxParticipants: 50000,
+        image: "https://i.suar.me/5L11K/l"
+      }
     };
 
     // Tier System
@@ -1448,7 +1735,8 @@
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('active');
       });
-      event.currentTarget.classList.add('active');
+      const currentBtn = document.querySelector(`.nav-btn[onclick*="${pageId}"]`);
+      if (currentBtn) currentBtn.classList.add('active');
       
       // Update page title and description
       if (pageId === 'home-page') {
@@ -1465,6 +1753,25 @@
         document.getElementById('page-title').textContent = 'GW Token Airdrop';
         document.getElementById('page-description').textContent = 'Token distribution based on your activities';
         updateAirdropPage();
+      } else if (pageId === 'gift-page') {
+        document.getElementById('page-title').textContent = 'Gift Subscriptions';
+        document.getElementById('page-description').textContent = 'Participate and win amazing prizes!';
+        updateGiftPage();
+      }
+    }
+
+    // Update Gift page
+    function updateGiftPage() {
+      // Update gift buttons based on subscription status
+      for (let i = 1; i <= 3; i++) {
+        const button = document.querySelector(`button[onclick="subscribeToGift(${i})"]`);
+        if (appState.giftsSubscribed[i]) {
+          button.textContent = "Subscribed";
+          button.classList.add('disabled');
+        } else {
+          button.textContent = "Subscribe Now";
+          button.classList.remove('disabled');
+        }
       }
     }
 
@@ -1483,16 +1790,16 @@
       videoScreen.style.display = "none";
     });
 
-    // Adsgram Ad Task
+    // Adsgram Ad Task - Modified to allow every 20 seconds
     adsgramTaskBtn.addEventListener("click", async () => {
       if (appState.adsgramTask.completed) {
         const lastCompleted = new Date(appState.adsgramTask.lastCompleted);
         const now = new Date();
         
-        // Check if 24 hours have passed since last completion
-        if (now - lastCompleted < 24 * 60 * 60 * 1000) {
-          const hoursLeft = 24 - Math.floor((now - lastCompleted) / (1000 * 60 * 60));
-          alert(`You can retry this task in ${hoursLeft} hours`);
+        // Check if 20 seconds have passed since last completion
+        if (now - lastCompleted < 20000) {
+          const secondsLeft = 20 - Math.floor((now - lastCompleted) / 1000);
+          alert(`You can retry this task in ${secondsLeft} seconds`);
           return;
         }
       }
@@ -1728,6 +2035,11 @@
       if (document.getElementById('airdrop-page').classList.contains('active')) {
         updateAirdropPage();
       }
+      
+      // Update Gift page if active
+      if (document.getElementById('gift-page').classList.contains('active')) {
+        updateGiftPage();
+      }
     }
 
     // Get current tier based on gold bars
@@ -1891,10 +2203,15 @@
         appState.tonTransactions = data.tonTransactions || 0;
         appState.gwTokens = data.gwTokens || 0;
         appState.isNewUser = false;
+        appState.giftsSubscribed = data.giftsSubscribed || {
+          1: false,
+          2: false,
+          3: false
+        };
       } else {
         // Default data for new user
         appState.goldBars = 0;
-        appState.giftCoins = 30; // Give 30 GW coins to new users
+        appState.giftCoins = 40; // Give 40 Gift Coins to new users
         appState.rank = "+100K";
         appState.tasksCompleted = [];
         appState.dailyStreak = 0;
@@ -1912,6 +2229,11 @@
         appState.tonTransactions = 0;
         appState.gwTokens = 0;
         appState.isNewUser = true;
+        appState.giftsSubscribed = {
+          1: false,
+          2: false,
+          3: false
+        };
         
         // Try to get Telegram user data
         try {
@@ -1948,19 +2270,19 @@
         const lastCompleted = new Date(task.lastCompleted);
         const now = new Date();
         
-        if (now - lastCompleted < 24 * 60 * 60 * 1000) {
-          // Less than 24 hours since completion
+        if (now - lastCompleted < 20000) {
+          // Less than 20 seconds since completion
           button.classList.add('completed');
           button.textContent = 'Completed';
           
           // Calculate time left
-          const hoursLeft = 24 - Math.floor((now - lastCompleted) / (1000 * 60 * 60));
+          const secondsLeft = 20 - Math.floor((now - lastCompleted) / 1000);
           setTimeout(() => {
             button.classList.remove('completed');
             button.textContent = 'Watch Now';
-          }, (24 * 60 * 60 * 1000) - (now - lastCompleted));
+          }, 20000 - (now - lastCompleted));
         } else {
-          // 24 hours passed, can retry
+          // 20 seconds passed, can retry
           button.classList.remove('completed');
           button.textContent = 'Watch Now';
         }
@@ -1987,7 +2309,8 @@
           completedTasks: appState.completedTasks,
           giftParticipations: appState.giftParticipations,
           tonTransactions: appState.tonTransactions,
-          gwTokens: appState.gwTokens
+          gwTokens: appState.gwTokens,
+          giftsSubscribed: appState.giftsSubscribed
         }));
       }
     }
@@ -2021,11 +2344,6 @@
         } else {
           convertButton.disabled = true;
         }
-      });
-      
-      // Gift button is empty as requested
-      document.getElementById('gift-button').addEventListener('click', function() {
-        // Empty as requested
       });
     });
     
@@ -2093,6 +2411,117 @@
         button.textContent = 'Join Now';
         document.getElementById(`${taskId.replace('task', 'progress')}`).style.width = '0%';
       }, 24 * 60 * 60 * 1000);
+    }
+    
+    // Subscribe to a gift
+    function subscribeToGift(giftId) {
+      if (appState.giftsSubscribed[giftId]) {
+        alert('You have already subscribed to this gift!');
+        return;
+      }
+      
+      appState.currentGiftSelection = giftId;
+      const gift = giftDetails[giftId];
+      
+      // Set modal content
+      document.getElementById('gift-modal-title').textContent = `Subscribe to ${gift.title}`;
+      document.getElementById('gift-modal-description').textContent = `Choose your payment method for this gift subscription`;
+      document.getElementById('coins-amount').textContent = gift.coinsPrice;
+      document.getElementById('ton-amount').textContent = gift.tonPrice;
+      
+      // Reset selection
+      appState.paymentMethod = null;
+      document.getElementById('coins-option').style.border = 'none';
+      document.getElementById('ton-option').style.border = 'none';
+      
+      // Show modal
+      document.getElementById('gift-modal').style.display = 'flex';
+    }
+    
+    // Select payment method for gift subscription
+    function selectPaymentMethod(method) {
+      appState.paymentMethod = method;
+      
+      // Update UI
+      if (method === 'coins') {
+        document.getElementById('coins-option').style.border = '2px solid var(--primary-color)';
+        document.getElementById('ton-option').style.border = 'none';
+      } else {
+        document.getElementById('coins-option').style.border = 'none';
+        document.getElementById('ton-option').style.border = '2px solid var(--primary-color)';
+      }
+    }
+    
+    // Confirm gift subscription
+    async function confirmSubscription() {
+      if (!appState.paymentMethod) {
+        alert('Please select a payment method');
+        return;
+      }
+      
+      const giftId = appState.currentGiftSelection;
+      const gift = giftDetails[giftId];
+      
+      if (appState.paymentMethod === 'coins') {
+        // Pay with Gift Coins
+        if (appState.giftCoins < gift.coinsPrice) {
+          alert('You don\'t have enough Gift Coins');
+          return;
+        }
+        
+        appState.giftCoins -= gift.coinsPrice;
+        appState.giftsSubscribed[giftId] = true;
+        appState.giftParticipations++;
+        
+        saveUserData();
+        updateUI();
+        showConfetti();
+        
+        alert(`Successfully subscribed to ${gift.title}!`);
+        closeModal();
+      } else {
+        // Pay with TON
+        if (!appState.walletConnected) {
+          alert('You need to connect your wallet first!');
+          return;
+        }
+        
+        try {
+          const tx = {
+            validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes
+            messages: [
+              {
+                address: 'UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3', // Replace with your wallet address
+                amount: (gift.tonPrice * 1000000000).toString(), // Convert TON to nanoTON
+              }
+            ]
+          };
+          
+          const result = await tonConnectUI.sendTransaction(tx);
+          
+          // If transaction succeeds
+          appState.giftsSubscribed[giftId] = true;
+          appState.tonTransactions++;
+          appState.giftParticipations++;
+          
+          saveUserData();
+          updateUI();
+          showConfetti();
+          closeModal();
+          
+          alert(`Successfully subscribed to ${gift.title}!`);
+        } catch (error) {
+          console.error('Transaction failed:', error);
+          alert('Transaction failed: ' + error.message);
+        }
+      }
+    }
+    
+    // Close modal
+    function closeModal() {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.style.display = 'none';
+      });
     }
   </script>
 </body>
