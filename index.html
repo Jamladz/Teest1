@@ -20,6 +20,7 @@
       --platinum: #e5e4e2;
       --diamond: #b9f2ff;
       --gold-bar: #FFD700;
+      --referral-color: #8a2be2;
     }
     
     * {
@@ -116,60 +117,30 @@
       to { opacity: 1; transform: translateY(0); }
     }
     
-    .gift-stack {
-      position: relative;
+    /* Updated gift container */
+    .gift-container {
       width: 100%;
       max-width: 320px;
-      height: 200px;
+      height: 240px;
       margin: 15px 0 25px;
-      perspective: 1000px;
       display: flex;
       justify-content: center;
       align-items: center;
     }
     
-    .gift-card {
-      position: absolute;
+    .gift-image {
       width: 100%;
-      height: 180px;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(110, 142, 251, 0.3);
-      border: 2px solid rgba(110, 142, 251, 0.2);
-      transition: transform 0.3s, box-shadow 0.3s;
+      height: 100%;
+      background-image: url('https://i.suar.me/xpLjX/l');
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
-      overflow: hidden;
+      filter: drop-shadow(0 0 15px rgba(167, 119, 227, 0.5));
+      transition: transform 0.3s ease;
     }
     
-    .gift-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(110, 142, 251, 0.1) 0%, rgba(167, 119, 227, 0.1) 100%);
-    }
-    
-    /* Updated to use the specified image without background */
-    .gift-card:nth-child(1) {
-      z-index: 5;
-      transform: translateY(0) rotateZ(0deg);
-      background-image: url('https://i.suar.me/xpLjX/l');
-      background-size: 70%;
-      background-position: center;
-    }
-    
-    .gift-card:nth-child(1)::before {
-      display: none;
-    }
-    
-    .gift-card:nth-child(2),
-    .gift-card:nth-child(3),
-    .gift-card:nth-child(4),
-    .gift-card:nth-child(5) {
-      display: none;
+    .gift-image:hover {
+      transform: scale(1.05);
     }
     
     .leaderboard {
@@ -825,6 +796,119 @@
       background: rgba(255, 255, 255, 0.1);
       cursor: not-allowed;
     }
+    
+    /* Referral Section */
+    .referral-section {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 20px;
+      width: 100%;
+      max-width: 350px;
+      margin-top: 20px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .referral-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--referral-color), #d946ef);
+    }
+    
+    .referral-section h2 {
+      font-size: 20px;
+      color: var(--referral-color);
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    
+    .referral-info {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-light);
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    
+    .referral-link-container {
+      display: flex;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .referral-link {
+      flex: 1;
+      background: rgba(138, 43, 226, 0.1);
+      border: 1px solid rgba(138, 43, 226, 0.2);
+      padding: 12px 15px;
+      font-size: 12px;
+      color: white;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .copy-button {
+      background: linear-gradient(135deg, var(--referral-color), #d946ef);
+      color: white;
+      border: none;
+      padding: 12px 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    .copy-button:hover {
+      background: linear-gradient(135deg, #7a1cc9, #c026d3);
+    }
+    
+    .referral-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+    
+    .referral-stat {
+      text-align: center;
+      flex: 1;
+      padding: 10px;
+      background: rgba(138, 43, 226, 0.1);
+      border-radius: 8px;
+      margin: 0 5px;
+    }
+    
+    .referral-stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--referral-color);
+    }
+    
+    .referral-stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+    
+    .bonus-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: linear-gradient(135deg, var(--gold), #ffc107);
+      color: #333;
+      font-weight: bold;
+      padding: 5px 15px;
+      font-size: 12px;
+      border-radius: 20px;
+      transform: rotate(15deg);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -845,12 +929,9 @@
     <div class="main-content">
       <!-- Home Page -->
       <div class="page active" id="home-page">
-        <div class="gift-stack">
-          <div class="gift-card"></div>
-          <div class="gift-card"></div>
-          <div class="gift-card"></div>
-          <div class="gift-card"></div>
-          <div class="gift-card"></div>
+        <!-- Updated gift container without frame -->
+        <div class="gift-container">
+          <div class="gift-image"></div>
         </div>
         
         <p class="status" id="status">🔌 Wallet not connected</p>
@@ -900,6 +981,33 @@
             </div>
           </div>
           <button class="airdrop-button" onclick="showConvertModal()">Convert Gold Bars</button>
+        </div>
+        
+        <!-- Referral Section -->
+        <div class="referral-section">
+          <div class="bonus-badge">+10% Bonus</div>
+          <h2>Referral Program</h2>
+          <div class="referral-info">
+            Invite friends and earn 10% of their rewards! Share your unique link:
+          </div>
+          
+          <div class="referral-link-container">
+            <div class="referral-link" id="referral-link">Connect wallet to generate your link</div>
+            <button class="copy-button" id="copy-button" onclick="copyReferralLink()">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+          
+          <div class="referral-stats">
+            <div class="referral-stat">
+              <div class="referral-stat-value" id="referrals-count">0</div>
+              <div class="referral-stat-label">Referrals</div>
+            </div>
+            <div class="referral-stat">
+              <div class="referral-stat-value" id="referral-earnings">0</div>
+              <div class="referral-stat-label">Gold Bars Earned</div>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -1106,7 +1214,9 @@
       },
       walletConnected: false,
       telegramUser: null,
-      swapEnabled: false
+      swapEnabled: false,
+      referralsCount: 0,
+      referralEarnings: 0
     };
 
     // Tier System
@@ -1551,6 +1661,9 @@
       
       // Update tier badge
       updateTierBadge();
+      
+      // Update referral stats
+      updateReferralStats();
     }
 
     // Get current tier based on gold bars
@@ -1595,6 +1708,48 @@
       }
       
       document.getElementById('profile-rank-value').textContent = appState.rank;
+    }
+
+    // Update referral stats
+    function updateReferralStats() {
+      document.getElementById('referrals-count').textContent = appState.referralsCount;
+      document.getElementById('referral-earnings').textContent = appState.referralEarnings;
+    }
+
+    // Generate referral link
+    function generateReferralLink() {
+      const baseUrl = "https://t.me/GiftwinerBot";
+      let identifier = "user";
+      
+      if (appState.telegramUser && appState.telegramUser.username) {
+        identifier = appState.telegramUser.username;
+      } else if (tonConnectUI.account) {
+        identifier = tonConnectUI.account.address.slice(-6);
+      }
+      
+      return `${baseUrl}?start=ref_${identifier}`;
+    }
+
+    // Copy referral link to clipboard
+    function copyReferralLink() {
+      if (!appState.walletConnected) {
+        alert('Please connect your wallet first to generate your referral link');
+        return;
+      }
+      
+      const link = generateReferralLink();
+      navigator.clipboard.writeText(link)
+        .then(() => {
+          const button = document.getElementById('copy-button');
+          button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+          setTimeout(() => {
+            button.innerHTML = '<i class="fas fa-copy"></i>';
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+          alert('Failed to copy referral link');
+        });
     }
 
     // Show confetti effect
@@ -1664,6 +1819,8 @@
         };
         appState.telegramUser = data.telegramUser || null;
         appState.swapEnabled = data.giftCoins > 0 || false;
+        appState.referralsCount = data.referralsCount || 0;
+        appState.referralEarnings = data.referralEarnings || 0;
       } else {
         // Default data for new user
         appState.goldBars = 0;
@@ -1677,6 +1834,8 @@
           'telegram-task-2': { completed: false, lastCompleted: null }
         };
         appState.swapEnabled = false;
+        appState.referralsCount = 0;
+        appState.referralEarnings = 0;
         
         // Try to get Telegram user data
         try {
@@ -1696,6 +1855,21 @@
       
       // Update Telegram tasks
       updateTelegramTasks();
+      
+      // Update referral link
+      updateReferralLink();
+    }
+    
+    // Update referral link display
+    function updateReferralLink() {
+      const referralLinkElement = document.getElementById('referral-link');
+      
+      if (appState.walletConnected) {
+        const link = generateReferralLink();
+        referralLinkElement.textContent = link;
+      } else {
+        referralLinkElement.textContent = "Connect wallet to generate your link";
+      }
     }
 
     // Save user data
@@ -1711,7 +1885,9 @@
           dailyStreak: appState.dailyStreak,
           lastDailyClaim: appState.lastDailyClaim,
           telegramTasks: appState.telegramTasks,
-          telegramUser: appState.telegramUser
+          telegramUser: appState.telegramUser,
+          referralsCount: appState.referralsCount,
+          referralEarnings: appState.referralEarnings
         }));
       }
     }
