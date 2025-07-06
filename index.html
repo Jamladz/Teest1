@@ -1182,6 +1182,16 @@
       background: rgba(110, 142, 251, 0.1);
       border: 1px solid var(--primary-color);
     }
+    
+    .exchange-rate-banner {
+      background: linear-gradient(90deg, #ffd700, #ffb700);
+      color: #000;
+      font-weight: bold;
+      padding: 10px;
+      text-align: center;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -1202,6 +1212,10 @@
     <div class="main-content">
       <!-- Home Page -->
       <div class="page active" id="home-page">
+        <div class="exchange-rate-banner">
+          <i class="fas fa-exchange-alt"></i> New Exchange Rate: 1000 Gold Bars = 200 Gift Coins
+        </div>
+        
         <div class="gift-container">
           <div class="gift-image"></div>
         </div>
@@ -1249,7 +1263,7 @@
             </div>
             <div class="airdrop-stat">
               <div class="airdrop-stat-value">1,000</div>
-              <div class="airdrop-stat-label">Gold Bars = 1 Coin</div>
+              <div class="airdrop-stat-label">Gold Bars = 200 Coins</div>
             </div>
           </div>
           <button class="airdrop-button" onclick="showConvertModal()">Convert Gold Bars</button>
@@ -1285,6 +1299,10 @@
       
       <!-- Tasks Page -->
       <div class="page" id="tasks-page">
+        <div class="exchange-rate-banner">
+          <i class="fas fa-exchange-alt"></i> New Exchange Rate: 1000 Gold Bars = 200 Gift Coins
+        </div>
+        
         <div class="tasks-container">
           <h2 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">Available Tasks</h2>
           
@@ -1360,6 +1378,10 @@
       
       <!-- Profile Page -->
       <div class="page" id="profile-page">
+        <div class="exchange-rate-banner">
+          <i class="fas fa-exchange-alt"></i> New Exchange Rate: 1000 Gold Bars = 200 Gift Coins
+        </div>
+        
         <div class="profile-container">
           <div id="profile-avatar" class="profile-avatar">??</div>
           <div id="profile-username" class="profile-username">...</div>
@@ -1374,7 +1396,7 @@
         <div class="convert-section">
           <h2>Convert Gold Bars</h2>
           <div class="convert-info">
-            1,000 gold bars = 1 Gift Winner coin
+            1,000 gold bars = 200 Gift Winner coins
           </div>
           <div class="convert-input">
             <input type="number" id="convert-amount" placeholder="Enter gold bars amount" min="1000" step="1000">
@@ -1394,6 +1416,10 @@
       
       <!-- New Airdrop Page -->
       <div class="page" id="airdrop-page">
+        <div class="exchange-rate-banner">
+          <i class="fas fa-exchange-alt"></i> New Exchange Rate: 1000 Gold Bars = 200 Gift Coins
+        </div>
+        
         <div class="airdrop-page">
           <img src="https://i.suar.me/NzAB4/l" class="gw-token-icon" alt="GW Token">
           <h2>GW Token Airdrop</h2>
@@ -1434,6 +1460,10 @@
       
       <!-- New Gift Page -->
       <div class="page" id="gift-page">
+        <div class="exchange-rate-banner">
+          <i class="fas fa-exchange-alt"></i> New Exchange Rate: 1000 Gold Bars = 200 Gift Coins
+        </div>
+        
         <div class="gift-page">
           <h2>Gift Subscriptions</h2>
           <p class="airdrop-description">Participate in our gifts and win amazing prizes!</p>
@@ -1562,7 +1592,7 @@
     <div class="modal-content">
       <div class="modal-title">Convert Gold Bars</div>
       <div class="convert-info">
-        Convert your gold bars to Gift Winner coins at a rate of 1,000 gold bars = 1 coin
+        Convert your gold bars to Gift Winner coins at a rate of 1,000 gold bars = 200 coins
       </div>
       <div class="convert-input">
         <input type="number" id="modal-convert-amount" placeholder="Enter gold bars amount" min="1000" step="1000">
@@ -1879,8 +1909,8 @@
         return;
       }
       
-      const coins = Math.floor(amount / 1000);
-      const remainingBars = amount % 1000;
+      // New exchange rate: 1000 gold bars = 200 coins
+      const coins = Math.floor((amount / 1000) * 200);
       
       appState.goldBars -= amount;
       appState.giftCoins += coins;
@@ -1909,7 +1939,8 @@
       // Add event listener for input changes
       document.getElementById('modal-convert-amount').addEventListener('input', function() {
         const goldBars = parseInt(this.value) || 0;
-        const coins = Math.floor(goldBars / 1000);
+        // New exchange rate: 1000 gold bars = 200 coins
+        const coins = Math.floor((goldBars / 1000) * 200);
         document.getElementById('convert-result').textContent = `You will receive: ${coins} coins`;
       });
     }
@@ -1927,8 +1958,8 @@
         return;
       }
       
-      const coins = Math.floor(amount / 1000);
-      const remainingBars = amount % 1000;
+      // New exchange rate: 1000 gold bars = 200 coins
+      const coins = Math.floor((amount / 1000) * 200);
       
       appState.goldBars -= amount;
       appState.giftCoins += coins;
