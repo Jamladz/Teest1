@@ -8,25 +8,41 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
-    /* أنماط جديدة للصفحات الجديدة */
+    /* New styles for gift pages */
     .gift-page {
       width: 100%;
-      max-width: 350px;
+      max-width: 800px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 20px;
+    }
+    
+    .gift-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 25px;
+      width: 100%;
+      margin-top: 20px;
     }
     
     .gift-item {
-      background: var(--card-bg);
+      background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(50, 50, 50, 0.8));
       border-radius: 20px;
       padding: 20px;
-      width: 100%;
-      margin-bottom: 20px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       position: relative;
       overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .gift-item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px rgba(167, 119, 227, 0.25);
     }
     
     .gift-image-container {
@@ -38,21 +54,36 @@
       margin-bottom: 15px;
       border-radius: 15px;
       overflow: hidden;
-      background: rgba(0,0,0,0.2);
+      background: rgba(0, 0, 0, 0.15);
+      position: relative;
     }
     
     .gift-image {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .gift-item:hover .gift-image {
+      transform: scale(1.05);
     }
     
     .gift-title {
       font-size: 18px;
       font-weight: 700;
-      color: var(--primary-color);
+      color: #fff;
       margin-bottom: 10px;
       text-align: center;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .gift-description {
+      font-size: 14px;
+      color: #aaa;
+      text-align: center;
+      margin-bottom: 15px;
+      flex-grow: 1;
     }
     
     .gift-price {
@@ -60,6 +91,7 @@
       justify-content: center;
       gap: 15px;
       margin-bottom: 15px;
+      flex-wrap: wrap;
     }
     
     .price-option {
@@ -67,7 +99,8 @@
       align-items: center;
       padding: 8px 15px;
       border-radius: 20px;
-      background: rgba(110, 142, 251, 0.1);
+      background: rgba(110, 142, 251, 0.15);
+      font-size: 14px;
     }
     
     .gift-icon, .ton-icon {
@@ -80,8 +113,9 @@
     .gift-winners {
       text-align: center;
       font-size: 14px;
-      color: var(--text-muted);
+      color: #6e8efb;
       margin-bottom: 15px;
+      font-weight: 500;
     }
     
     .gift-progress-container {
@@ -94,7 +128,7 @@
       justify-content: space-between;
       margin-bottom: 5px;
       font-size: 12px;
-      color: var(--text-muted);
+      color: #aaa;
     }
     
     .gift-progress-bar {
@@ -106,26 +140,29 @@
     
     .gift-progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      background: linear-gradient(90deg, #6e8efb, #a777e3);
       border-radius: 5px;
     }
     
     .gift-button {
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      background: linear-gradient(135deg, #6e8efb, #a777e3);
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 12px 20px;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.3s;
       width: 100%;
       text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: auto;
     }
     
     .gift-button:hover {
-      transform: translateY(-2px);
+      background: linear-gradient(135deg, #5d7de0, #9666d8);
       box-shadow: 0 5px 15px rgba(110, 142, 251, 0.4);
     }
     
@@ -142,13 +179,37 @@
       background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
       color: white;
       font-weight: bold;
-      padding: 3px 10px;
+      padding: 4px 12px;
       font-size: 12px;
-      border-radius: 15px;
+      border-radius: 20px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      z-index: 2;
     }
     
-    /* تعديلات أخرى للتصميم العام */
+    .gift-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    
+    .gift-header h2 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #6e8efb, #a777e3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(110, 142, 251, 0.2);
+    }
+    
+    .gift-header p {
+      font-size: 16px;
+      color: #aaa;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    /* Base styles */
     :root {
       --primary-color: #6e8efb;
       --secondary-color: #a777e3;
@@ -259,7 +320,83 @@
       to { opacity: 1; transform: translateY(0); }
     }
     
-    .gift-container {
+    .navigation {
+      background-color: rgba(20, 20, 20, 0.95);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.5);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .nav-btn {
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      font-size: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 12px;
+      transition: all 0.3s;
+      min-width: 60px;
+    }
+    
+    .nav-btn.active {
+      color: var(--primary-color);
+      background: rgba(110, 142, 251, 0.1);
+      transform: translateY(-5px);
+    }
+    
+    .nav-btn i {
+      font-size: 18px;
+      margin-bottom: 3px;
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .gift-coin-icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    
+    /* Animation for gift items */
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .gift-item:nth-child(1) {
+      animation: float 4s ease-in-out infinite;
+    }
+    
+    .gift-item:nth-child(2) {
+      animation: float 4s ease-in-out infinite 0.5s;
+    }
+    
+    .gift-item:nth-child(3) {
+      animation: float 4s ease-in-out infinite 1s;
+    }
+    
+    /* Original styles maintained below */
+    .gift-container-original {
       width: 100%;
       max-width: 320px;
       height: 240px;
@@ -269,7 +406,7 @@
       align-items: center;
     }
     
-    .gift-image {
+    .gift-image-original {
       width: 100%;
       height: 100%;
       background-image: url('https://i.suar.me/xpLjX/l');
@@ -280,7 +417,7 @@
       transition: transform 0.3s ease;
     }
     
-    .gift-image:hover {
+    .gift-image-original:hover {
       transform: scale(1.05);
     }
     
@@ -509,41 +646,6 @@
       color: var(--text-muted);
     }
     
-    .navigation {
-      background-color: rgba(20, 20, 20, 0.95);
-      display: flex;
-      justify-content: space-around;
-      padding: 12px 0;
-      box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.5);
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    .nav-btn {
-      color: var(--text-muted);
-      background: none;
-      border: none;
-      font-size: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      padding: 8px 10px;
-      border-radius: 12px;
-      transition: all 0.3s;
-      min-width: 60px;
-    }
-    
-    .nav-btn.active {
-      color: var(--primary-color);
-      background: rgba(110, 142, 251, 0.1);
-      transform: translateY(-5px);
-    }
-    
-    .nav-btn i {
-      font-size: 18px;
-      margin-bottom: 3px;
-    }
-    
     .status {
       margin-top: 10px;
       font-size: 12px;
@@ -748,13 +850,6 @@
     .gold-bar-icon {
       color: var(--gold-bar);
       margin-right: 5px;
-    }
-    
-    .gift-coin-icon {
-      width: 16px;
-      height: 16px;
-      margin-right: 5px;
-      vertical-align: middle;
     }
     
     .airdrop-section {
@@ -1164,20 +1259,6 @@
       background-color: rgba(255, 0, 0, 0.8);
     }
     
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: var(--primary-color);
-      animation: spin 1s ease-in-out infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
     .adsgram-task {
       background: rgba(110, 142, 251, 0.1);
       border: 1px solid var(--primary-color);
@@ -1216,8 +1297,8 @@
           <i class="fas fa-exchange-alt"></i> New Exchange Rate: 1000 Gold Bars = 200 Gift Coins
         </div>
         
-        <div class="gift-container">
-          <div class="gift-image"></div>
+        <div class="gift-container-original">
+          <div class="gift-image-original"></div>
         </div>
         
         <p class="status" id="status">🔌 Wallet not connected</p>
@@ -1465,91 +1546,98 @@
         </div>
         
         <div class="gift-page">
-          <h2>Gift Subscriptions</h2>
-          <p class="airdrop-description">Participate in our gifts and win amazing prizes!</p>
-          
-          <!-- Gift 1 -->
-          <div class="gift-item">
-            <div class="gift-badge">First Gift</div>
-            <div class="gift-image-container">
-              <img src="https://i.suar.me/ppxx4/l" class="gift-image" alt="First Gift">
-            </div>
-            <div class="gift-title">Premium Gift Box</div>
-            <div class="gift-price">
-              <div class="price-option">
-                <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 200 Gift Coins
-              </div>
-              <div class="price-option">
-                <img src="https://ton.org/download/ton_symbol.png" class="ton-icon"> 1 TON
-              </div>
-            </div>
-            <div class="gift-winners">2 Winners</div>
-            <div class="gift-progress-container">
-              <div class="gift-progress-label">
-                <span>Participants</span>
-                <span id="gift1-participants">2782/3000</span>
-              </div>
-              <div class="gift-progress-bar">
-                <div class="gift-progress-fill" style="width: 81.8%"></div>
-              </div>
-            </div>
-            <button class="gift-button" onclick="subscribeToGift(1)">Subscribe Now</button>
+          <div class="gift-header">
+            <h2>Premium Gift Collection</h2>
+            <p>Participate in our exclusive gifts and stand a chance to win amazing prizes. Choose your favorite gift and subscribe now!</p>
           </div>
           
-          <!-- Gift 2 -->
-          <div class="gift-item">
-            <div class="gift-badge">Second Gift</div>
-            <div class="gift-image-container">
-              <img src="https://i.suar.me/XvAA5/l" class="gift-image" alt="Second Gift">
+          <div class="gift-container">
+            <!-- Gift 1: Plush Pepe -->
+            <div class="gift-item">
+              <div class="gift-badge">First Gift</div>
+              <div class="gift-image-container">
+                <img src="https://i.suar.me/j5MZW/m" class="gift-image" alt="Plush Pepe">
+              </div>
+              <div class="gift-title">Plush Pepe</div>
+              <div class="gift-description">A limited edition plush toy with premium materials and exclusive design</div>
+              <div class="gift-price">
+                <div class="price-option">
+                  <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 200 Gift Coins
+                </div>
+                <div class="price-option">
+                  <img src="https://ton.org/download/ton_symbol.png" class="ton-icon"> 1 TON
+                </div>
+              </div>
+              <div class="gift-winners">2 Winners</div>
+              <div class="gift-progress-container">
+                <div class="gift-progress-label">
+                  <span>Participants</span>
+                  <span>2782/3000</span>
+                </div>
+                <div class="gift-progress-bar">
+                  <div class="gift-progress-fill" style="width: 81.8%"></div>
+                </div>
+              </div>
+              <button class="gift-button" onclick="subscribeToGift(1)">Subscribe Now</button>
             </div>
-            <div class="gift-title">Special NFT</div>
-            <div class="gift-price">
-              <div class="price-option">
-                <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 100 Gift Coins
+            
+            <!-- Gift 2: Cupid Charm -->
+            <div class="gift-item">
+              <div class="gift-badge">Second Gift</div>
+              <div class="gift-image-container">
+                <img src="https://i.suar.me/Xv83X/m" class="gift-image" alt="Cupid Charm">
               </div>
-              <div class="price-option">
-                <img src="https://ton.org/download/ton_symbol.png" class="ton-icon"> 0.5 TON
+              <div class="gift-title">Cupid Charm</div>
+              <div class="gift-description">A romantic charm with intricate details and symbolic meaning</div>
+              <div class="gift-price">
+                <div class="price-option">
+                  <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 100 Gift Coins
+                </div>
+                <div class="price-option">
+                  <img src="https://ton.org/download/ton_symbol.png" class="ton-icon"> 0.5 TON
+                </div>
               </div>
+              <div class="gift-winners">5 Winners</div>
+              <div class="gift-progress-container">
+                <div class="gift-progress-label">
+                  <span>Participants</span>
+                  <span>5677/10000</span>
+                </div>
+                <div class="gift-progress-bar">
+                  <div class="gift-progress-fill" style="width: 34.9%"></div>
+                </div>
+              </div>
+              <button class="gift-button" onclick="subscribeToGift(2)">Subscribe Now</button>
             </div>
-            <div class="gift-winners">5 Winners</div>
-            <div class="gift-progress-container">
-              <div class="gift-progress-label">
-                <span>Participants</span>
-                <span id="gift2-participants">5677/10000</span>
+            
+            <!-- Gift 3: Valentine Box -->
+            <div class="gift-item">
+              <div class="gift-badge">Third Gift</div>
+              <div class="gift-image-container">
+                <img src="https://i.suar.me/5LGQM/m" class="gift-image" alt="Valentine Box">
               </div>
-              <div class="gift-progress-bar">
-                <div class="gift-progress-fill" style="width: 34.9%"></div>
+              <div class="gift-title">Valentine Box</div>
+              <div class="gift-description">A special collection for Valentine's Day with premium surprises</div>
+              <div class="gift-price">
+                <div class="price-option">
+                  <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 50 Gift Coins
+                </div>
+                <div class="price-option">
+                  <img src="https://ton.org/download/ton_symbol.png" class="ton-icon"> 0.05 TON
+                </div>
               </div>
+              <div class="gift-winners">Multiple Winners</div>
+              <div class="gift-progress-container">
+                <div class="gift-progress-label">
+                  <span>Participants</span>
+                  <span>45432/50000</span>
+                </div>
+                <div class="gift-progress-bar">
+                  <div class="gift-progress-fill" style="width: 74.9%"></div>
+                </div>
+              </div>
+              <button class="gift-button" onclick="subscribeToGift(3)">Subscribe Now</button>
             </div>
-            <button class="gift-button" onclick="subscribeToGift(2)">Subscribe Now</button>
-          </div>
-          
-          <!-- Gift 3 -->
-          <div class="gift-item">
-            <div class="gift-badge">Third Gift</div>
-            <div class="gift-image-container">
-              <img src="https://i.suar.me/5L11K/l" class="gift-image" alt="Third Gift">
-            </div>
-            <div class="gift-title">Exclusive Token</div>
-            <div class="gift-price">
-              <div class="price-option">
-                <img src="https://i.suar.me/NzAB4/l" class="gift-icon"> 50 Gift Coins
-              </div>
-              <div class="price-option">
-                <img src="https://ton.org/download/ton_symbol.png" class="ton-icon"> 0.05 TON
-              </div>
-            </div>
-            <div class="gift-winners">Multiple Winners</div>
-            <div class="gift-progress-container">
-              <div class="gift-progress-label">
-                <span>Participants</span>
-                <span id="gift3-participants">45432/50000</span>
-              </div>
-              <div class="gift-progress-bar">
-                <div class="gift-progress-fill" style="width: 74.9%"></div>
-              </div>
-            </div>
-            <button class="gift-button" onclick="subscribeToGift(3)">Subscribe Now</button>
           </div>
         </div>
       </div>
@@ -1668,31 +1756,31 @@
     // Gift details
     const giftDetails = {
       1: {
-        title: "Premium Gift Box",
+        title: "Plush Pepe",
         coinsPrice: 200,
         tonPrice: 1,
         winners: 2,
         participants: 2453,
         maxParticipants: 3000,
-        image: "https://i.suar.me/ppxx4/l"
+        image: "https://i.suar.me/j5MZW/m"
       },
       2: {
-        title: "Special NFT",
+        title: "Cupid Charm",
         coinsPrice: 100,
         tonPrice: 0.5,
         winners: 5,
         participants: 3487,
         maxParticipants: 10000,
-        image: "https://i.suar.me/XvAA5/l"
+        image: "https://i.suar.me/Xv83X/m"
       },
       3: {
-        title: "Exclusive Token",
+        title: "Valentine Box",
         coinsPrice: 50,
         tonPrice: 0.05,
         winners: "Multiple",
         participants: 37432,
         maxParticipants: 50000,
-        image: "https://i.suar.me/5L11K/l"
+        image: "https://i.suar.me/5LGQM/m"
       }
     };
 
