@@ -1,0 +1,6 @@
+{
+  "name": "GramQash",
+  "description": "Premium Telegram mini-app play-to-earn hub. Solve challenges, claim daily checking assets, convert GQH to GRAM, and join a digital crypto playground on the TON network.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

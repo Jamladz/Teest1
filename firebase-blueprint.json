@@ -1,0 +1,55 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and balances",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "avatar": { "type": "string" },
+        "tonBalance": { "type": "number" },
+        "gqhBalance": { "type": "number" },
+        "walletAddress": { "type": ["string", "null"] },
+        "referralCount": { "type": "number" },
+        "referralEarnings": { "type": "number" },
+        "hasClaimedWelcomeBonus": { "type": "boolean" },
+        "telegramJoined": { "type": "boolean" },
+        "dailyClaimedAt": { "type": ["string", "null"] },
+        "adCooldownSeconds": { "type": "number" },
+        "hapticEnabled": { "type": "boolean" },
+        "soundEnabled": { "type": "boolean" },
+        "completedTasksCount": { "type": "number" },
+        "watchedAdsCount": { "type": "number" },
+        "dailyCheckInCount": { "type": "number" },
+        "telegramTasksCount": { "type": "number" },
+        "airdropRegistered": { "type": "boolean" },
+        "miningEnergy": { "type": "number" }
+      },
+      "required": ["username", "tonBalance", "gqhBalance"]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "Log of user activity",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "title": { "type": "string" },
+        "amount": { "type": "string" },
+        "token": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["type", "title", "amount", "token", "timestamp"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Contains user data"
+    },
+    "users/{userId}/logs/{logId}": {
+      "schema": "ActivityLog",
+      "description": "Contains user activity logs"
+    }
+  }
+}
