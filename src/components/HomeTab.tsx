@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeftRight, Gift, Link2, Info, RefreshCw, Trophy, Zap, AlertTriangle, X, Volume2, VolumeX, Shield, Award, Clock, CheckCircle2, Sparkles, TrendingUp, BadgeCheck, Radio, HelpCircle, Target, Database, Pencil } from 'lucide-react';
-import { UserState } from '../types';
+import { UserState, PROFILE_BACKGROUNDS } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 
@@ -82,13 +82,6 @@ export function getLeague(gqh: number) {
   };
 }
 
-const PROFILE_BACKGROUNDS = [
-  null, // default solid gradient
-  "https://i.suar.me/2zOW9/l",
-  "https://i.suar.me/Lpozo/l",
-  "https://i.suar.me/8zo1y/l",
-  "https://i.suar.me/jv05v/l"
-];
 
 export default function HomeTab({
   user,

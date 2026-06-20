@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Copy, Check, Send, AlertTriangle, History, ArrowDownToLine, Users, Share2, Volume2, Sparkles, Pencil, X, CheckCircle2 } from 'lucide-react';
-import { UserState, ActivityLog } from '../types';
+import { UserState, ActivityLog, PROFILE_BACKGROUNDS } from '../types';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -44,14 +44,7 @@ export default function ProfileTab({
 
   const canClaimReferral = !user.dailyReferralClaimedAt || new Date().getTime() - new Date(user.dailyReferralClaimedAt).getTime() > 86400000;
 
-  const PROFILE_BACKGROUNDS = [
-    null,
-    "https://i.suar.me/2zOW9/l",
-    "https://i.suar.me/Lpozo/l",
-    "https://i.suar.me/8zo1y/l",
-    "https://i.suar.me/jv05v/l"
-  ];
-  
+
   const handleSelectBg = (index: number) => {
     if (onUpdateProfileBg) onUpdateProfileBg(index);
     setShowBgModal(false);
@@ -65,11 +58,13 @@ export default function ProfileTab({
         {/* Background Image Layer */}
         {PROFILE_BACKGROUNDS[profileBgIndex] && (
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 z-0"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
             style={{ backgroundImage: `url(${PROFILE_BACKGROUNDS[profileBgIndex]})` }}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1e] via-[#1c1c1e]/80 to-transparent z-0" />
+        
+        {/* Stronger overlay gradient for text readability with clear background */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1e] via-[#1c1c1e]/70 to-[#1c1c1e]/40 z-0" />
         <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-tr from-purple-500/10 to-indigo-500/5 rounded-full blur-xl pointer-events-none z-0" />
 
         <div className="relative z-10">
@@ -79,27 +74,30 @@ export default function ProfileTab({
                 {user.username.slice(0, 2)}
               </span>
             </div>
-            <button 
-              onClick={() => setShowBgModal(true)}
-              className="absolute -bottom-1 -right-1 w-5 h-5 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition-colors z-20"
-            >
-              <Pencil className="w-3 h-3" />
-            </button>
           </div>
           <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full animate-pulse z-20" />
         </div>
 
-        <div className="space-y-0.5 relative z-10">
-          <h3 className="font-extrabold text-base text-slate-100 drop-shadow-sm">{user.username}</h3>
-          <p className="text-[10px] text-slate-500 font-mono tracking-wide">
-            {user.walletAddress ? (
-              <span className="text-blue-500 font-bold">
-                {user.walletAddress.slice(0, 6)}...{user.walletAddress.slice(-4)}
-              </span>
-            ) : (
-              <span className="text-slate-500 font-semibold italic">Wallet disconnected</span>
-            )}
-          </p>
+        <div className="space-y-0.5 relative z-10 flex items-center gap-2">
+          <div className="text-center">
+            <h3 className="font-extrabold text-base text-slate-100 drop-shadow-sm">{user.username}</h3>
+            <p className="text-[10px] text-slate-500 font-mono tracking-wide">
+              {user.walletAddress ? (
+                <span className="text-blue-500 font-bold">
+                  {user.walletAddress.slice(0, 6)}...{user.walletAddress.slice(-4)}
+                </span>
+              ) : (
+                <span className="text-slate-500 font-semibold italic">Wallet disconnected</span>
+              )}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowBgModal(true)}
+            className="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-full flex items-center justify-center transition-all shadow-md"
+            title="Change Background Theme"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 
