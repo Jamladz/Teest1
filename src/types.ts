@@ -21,6 +21,8 @@ export interface UserState {
   airdropRegistered?: boolean;
   miningEnergy?: number;
   profileBgIndex?: number;
+  withdrawalCount?: number;
+  lastActiveAt?: number;
 }
 
 export const PROFILE_BACKGROUNDS = [

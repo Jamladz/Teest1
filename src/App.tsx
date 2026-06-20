@@ -24,7 +24,8 @@ import {
   LogOut,
   QrCode,
   Radio,
-  Smartphone
+  Smartphone,
+  Shield
 } from 'lucide-react';
 
 import { UserState, ActivityLog } from './types';
@@ -423,7 +424,8 @@ export default function App() {
 
       setUser((prev) => ({
         ...prev,
-        tonBalance: 0.005
+        tonBalance: 0.005,
+        withdrawalCount: (prev.withdrawalCount || 0) + 1
       }));
 
       addLog('withdraw', 'GRAM (ton) payout settlement request', `-${amountWithdrawn.toFixed(3)}`, 'GRAM (ton)');
