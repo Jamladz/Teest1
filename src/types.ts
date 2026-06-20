@@ -23,6 +23,14 @@ export interface UserState {
   profileBgIndex?: number;
 }
 
+export const PROFILE_BACKGROUNDS = [
+  null, // default solid gradient
+  "https://i.suar.me/2zOW9/l",
+  "https://i.suar.me/Lpozo/l",
+  "https://i.suar.me/8zo1y/l",
+  "https://i.suar.me/jv05v/l"
+];
+
 export interface ActivityLog {
   id: string;
   type: 'bonus' | 'swap' | 'task' | 'game' | 'withdraw';

@@ -535,10 +535,10 @@ export default function App() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.15 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             >
               {activeTab === 'home' && (
                 <HomeTab
@@ -581,9 +581,13 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'admin' && (
+              {activeTab === 'admin' && (user?.username === 'sekanedr_is' ? (
                 <AdminTab />
-              )}
+              ) : (
+                <div className="flex items-center justify-center h-full text-slate-500">
+                  Access Denied
+                </div>
+              ))}
             </motion.div>
           </AnimatePresence>
         </main>
@@ -616,13 +620,13 @@ export default function App() {
         )}
 
         {/* BOTTOM FLOATING NAVIGATION BAR */}
-        <nav className="absolute bottom-0 left-0 right-0 z-30 border-t border-slate-900 bg-[#1c1c1e]/95 backdrop-blur-xl px-2 py-4 pb-6 flex justify-around shrink-0 select-none">
+        <nav className="absolute bottom-4 left-4 right-4 z-50 border border-white/5 bg-[#1c1c1e]/90 backdrop-blur-2xl px-2 py-3 rounded-2xl flex justify-around shrink-0 select-none shadow-[0_8px_32px_-4px_rgba(0,0,0,0.5)]">
           <button
             onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center gap-1.5 py-1 px-3.5 rounded-xl transition-all duration-200 ${
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all duration-300 ${
               activeTab === 'home'
                 ? 'text-white bg-white/10'
-                : 'text-slate-500 hover:text-slate-300'
+                : 'text-slate-500 hover:text-white'
             }`}
           >
             <Zap className="w-5 h-5" />
@@ -631,10 +635,10 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('tasks')}
-            className={`flex flex-col items-center gap-1.5 py-1 px-3.5 rounded-xl transition-all duration-200 ${
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all duration-300 ${
               activeTab === 'tasks'
                 ? 'text-white bg-white/10'
-                : 'text-slate-500 hover:text-slate-300'
+                : 'text-slate-500 hover:text-white'
             }`}
           >
             <Calendar className="w-5 h-5" />
@@ -643,10 +647,10 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('games')}
-            className={`flex flex-col items-center gap-1.5 py-1 px-3.5 rounded-xl transition-all duration-200 ${
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all duration-300 ${
               activeTab === 'games'
                 ? 'text-white bg-white/10'
-                : 'text-slate-500 hover:text-slate-300'
+                : 'text-slate-500 hover:text-white'
             }`}
           >
             <Gamepad2 className="w-5 h-5" />
@@ -655,10 +659,10 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center gap-1.5 py-1 px-3.5 rounded-xl transition-all duration-200 ${
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all duration-300 ${
               activeTab === 'profile'
                 ? 'text-white bg-white/10'
-                : 'text-slate-500 hover:text-slate-300'
+                : 'text-slate-500 hover:text-white'
             }`}
           >
             <User className="w-5 h-5" />
