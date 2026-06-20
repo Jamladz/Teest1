@@ -36,7 +36,9 @@ const getInitialUser = (): UserState => {
     telegramTasksCount: 0,
     gamesPlayedCount: 0,
     airdropRegistered: false,
-    miningEnergy: 1000
+    miningEnergy: 1000,
+    lastActiveAt: Date.now(),
+    withdrawalCount: 0
   };
 };
 
@@ -92,10 +94,11 @@ export function useFirebaseSync() {
   // Sync back to Firebase on User changes (debounced or directly)
   // For safety and fast response, we sync local storage quickly and Firebase slightly deferred or immediately
   useEffect(() => {
-    localStorage.setItem('gramqash_user_v1', JSON.stringify(user));
+    const updatedUser = { ...user, lastActiveAt: Date.now() };
+    localStorage.setItem('gramqash_user_v1', JSON.stringify(updatedUser));
     if (userId) {
       const ref = doc(db, 'users', userId);
-      setDoc(ref, user, { merge: true }).catch(err => console.error("Firebase write err:", err));
+      setDoc(ref, updatedUser, { merge: true }).catch(err => console.error("Firebase write err:", err));
     }
   }, [user, userId]);
 
