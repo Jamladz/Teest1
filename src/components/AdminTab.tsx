@@ -10,29 +10,32 @@ export default function AdminTab() {
   const [withdrawals, setWithdrawals] = useState(0);
 
   useEffect(() => {
-    // Subscribe to total users
+    // Subscribe to total users to get real metrics
     const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
       setTotalUsers(snapshot.size);
       
-      // Simulate "real-time active users" using some ratio of total users plus baseline
-      // Usually active users is around 10% of total users in simulation
-      setActiveUsers(Math.floor(snapshot.size * 0.15) + Math.floor(Math.random() * 5));
-    });
-
-    // Subscriptions for mock withdrawal demands
-    // Let's pretend some logs have 'type: "withdrawal"'
-    const unsubLogs = onSnapshot(collection(db, 'logs'), (snapshot) => {
-      let count = 0;
+      let active = 0;
+      let withdrawRequests = 0;
+      
       snapshot.forEach(doc => {
-        if (doc.data().type === 'withdrawal') count++;
+        const data = doc.data();
+        
+        // Count users active in the last 24 hours (86400000ms = 24h)
+        if (data.lastActiveAt && (Date.now() - data.lastActiveAt < 86400000)) {
+          active++;
+        }
+        
+        if (data.withdrawalCount && data.withdrawalCount > 0) {
+          withdrawRequests += data.withdrawalCount;
+        }
       });
-      // Just simulating that some users requested
-      setWithdrawals(count + Math.floor(snapshot.size / 10));
+      
+      setActiveUsers(active);
+      setWithdrawals(withdrawRequests);
     });
 
     return () => {
       unsubUsers();
-      unsubLogs();
     };
   }, []);
 
@@ -53,7 +56,7 @@ export default function AdminTab() {
             className="bg-indigo-950/30 border border-indigo-500/20 p-4 rounded-2xl flex flex-col items-center text-center shadow-lg"
           >
             <Users className="w-6 h-6 text-indigo-400 mb-2" />
-            <span className="text-2xl font-black text-white">{totalUsers + 12045}</span>
+            <span className="text-2xl font-black text-white">{totalUsers}</span>
             <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Total Users</span>
           </motion.div>
 
@@ -63,7 +66,7 @@ export default function AdminTab() {
           >
             <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-ping" />
             <Activity className="w-6 h-6 text-cyan-400 mb-2" />
-            <span className="text-2xl font-black text-white">{activeUsers + 842}</span>
+            <span className="text-2xl font-black text-white">{activeUsers}</span>
             <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Active Now</span>
           </motion.div>
 
@@ -72,7 +75,7 @@ export default function AdminTab() {
             className="bg-rose-950/30 border border-rose-500/20 p-4 rounded-2xl flex flex-col items-center text-center shadow-lg col-span-2"
           >
             <ArrowDownToLine className="w-6 h-6 text-rose-400 mb-2" />
-            <span className="text-2xl font-black text-white">{withdrawals + 43}</span>
+            <span className="text-2xl font-black text-white">{withdrawals}</span>
             <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Withdrawal Requests</span>
           </motion.div>
         </div>
