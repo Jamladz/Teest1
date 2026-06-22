@@ -222,10 +222,10 @@ export default function CardMatchGame({ onCollect, onExit }: CardMatchGameProps)
                 key={card.id}
                 layoutId={card.id}
                 onClick={() => handleCardClick(card)}
-                className={`absolute w-[21%] aspect-square rounded-xl overflow-hidden transition-all duration-300 flex items-center justify-center p-1 ${
+                className={`absolute w-[21%] aspect-square rounded-xl overflow-hidden transition-all duration-300 flex items-center justify-center bg-white ${
                   clickable 
-                  ? 'bg-gradient-to-br from-indigo-50 to-white border-[2px] border-indigo-200 hover:border-indigo-400 hover:-translate-y-1 shadow-[0_4px_12px_rgba(0,0,0,0.15)] z-20 hover:z-50 cursor-pointer' 
-                  : 'bg-slate-200 border-[2px] border-slate-300 brightness-75 cursor-not-allowed shadow-sm'
+                  ? 'border-[3px] border-indigo-400 hover:scale-105 shadow-[0_4px_12px_rgba(0,0,0,0.3)] z-20 hover:z-50 cursor-pointer' 
+                  : 'border-[3px] border-slate-600/60 brightness-50 cursor-not-allowed shadow-sm'
                 }`}
                 style={{
                   left: `${card.x}%`,
@@ -238,9 +238,7 @@ export default function CardMatchGame({ onCollect, onExit }: CardMatchGameProps)
                 exit={{ scale: 0, opacity: 0, transition: { duration: 0.2 } }}
                 whileTap={clickable ? { scale: 0.95 } : {}}
               >
-                <div className="w-full h-full rounded-lg bg-white flex items-center justify-center relative overflow-hidden">
                   <img src={card.imageUrl} alt="card" className="w-full h-full object-cover shrink-0"/>
-                </div>
               </motion.button>
             );
           })}
@@ -248,7 +246,7 @@ export default function CardMatchGame({ onCollect, onExit }: CardMatchGameProps)
       </div>
 
       {/* Slot Container */}
-      <div className="w-[94%] max-w-md mx-auto mb-16 sm:mb-20 bg-slate-900/95 backdrop-blur-2xl rounded-2xl p-2.5 sm:p-3 flex gap-1.5 sm:gap-2 items-center justify-center border border-slate-700 shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-10 box-border h-[80px] sm:h-[90px]">
+      <div className="w-[94%] max-w-md mx-auto mb-24 sm:mb-28 bg-slate-900/95 backdrop-blur-2xl rounded-2xl p-2.5 sm:p-3 flex gap-1.5 sm:gap-2 items-center justify-center border border-slate-700 shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-10 box-border h-[80px] sm:h-[90px]">
         <AnimatePresence mode="popLayout">
           {slots.map((card) => (
             <motion.div
@@ -257,16 +255,14 @@ export default function CardMatchGame({ onCollect, onExit }: CardMatchGameProps)
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 25 } }}
               exit={{ scale: 0, opacity: 0, transition: { duration: 0.2 } }}
-              className="flex-1 max-w-[13.5%] h-full bg-white rounded-xl overflow-hidden border-[2px] border-indigo-200 shadow-sm flex-shrink-0 flex items-center justify-center p-1"
+              className="flex-1 max-w-[13.5%] h-full bg-white rounded-lg overflow-hidden border-[3px] border-indigo-400 shadow-sm flex-shrink-0 flex items-center justify-center"
             >
-              <div className="w-full h-full rounded-lg overflow-hidden bg-slate-50 flex items-center justify-center relative">
                 <img src={card.imageUrl} alt="slot" className="w-full h-full object-cover" />
-              </div>
             </motion.div>
           ))}
         </AnimatePresence>
         {Array.from({ length: MAX_SLOTS - slots.length }).map((_, i) => (
-          <div key={`empty-${slots.length + i}`} className="flex-1 max-w-[13.5%] h-full bg-slate-800/80 rounded-xl border border-slate-600/50 border-dashed flex-shrink-0 shadow-inner" />
+          <div key={`empty-${slots.length + i}`} className="flex-1 max-w-[13.5%] h-full bg-slate-800/80 rounded-lg border-2 border-slate-600/50 border-dashed flex-shrink-0 shadow-inner" />
         ))}
       </div>
 
