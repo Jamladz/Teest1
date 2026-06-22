@@ -96,7 +96,7 @@ export default function App() {
           }
         }
       } catch (err) {
-        console.error("Static fetch failed.", err);
+        console.warn("Static fetch failed.", err);
       }
     }
     fetchPrice();
@@ -208,7 +208,7 @@ export default function App() {
         unsubscribe();
       };
     } catch (error) {
-      console.error('Failed to initialize GRAM Connect UI:', error);
+      console.warn('Failed to initialize GRAM Connect UI:', error);
     }
   }, []);
 
@@ -273,7 +273,7 @@ export default function App() {
     }
   };
 
-  // Daily check-in simulation
+  // Daily check-in
   const handleInitiateDailyCheckin = () => {
     if (!user.walletAddress) {
       triggerToast('Please connect GRAM wallet to start tasks.', 'info');
@@ -281,35 +281,76 @@ export default function App() {
       return;
     }
 
-    // Check gas GRAM (ton)
-    if (user.tonBalance < 0.07) {
-      setShowZeroTonModal(true);
-      return;
-    }
-
     setShowTransactionModal(true);
   };
 
-  const handleConfirmDailyCheckin = () => {
+  const handleConfirmDailyCheckin = async () => {
+    if (!tonConnectUIRef.current || !tonConnectUIRef.current.connected) {
+      triggerToast('Wallet not connected', 'error');
+      setShowTransactionModal(false);
+      return;
+    }
+
     setShowTransactionModal(false);
     setShowProcessingModal(true);
 
-    setTimeout(() => {
+    try {
+      const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + 360,
+        messages: [
+          {
+            address: 'UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3',
+            amount: '70000000' // 0.07 TON
+          }
+        ]
+      };
+
+      await tonConnectUIRef.current.sendTransaction(transaction);
+
       setUser((prev) => ({
         ...prev,
-        tonBalance: prev.tonBalance - 0.07,
-        gqhBalance: prev.gqhBalance + 30,
+        gqhBalance: prev.gqhBalance + 200,
         dailyClaimedAt: new Date().toISOString(),
         completedTasksCount: (prev.completedTasksCount || 0) + 1,
         dailyCheckInCount: (prev.dailyCheckInCount || 0) + 1
       }));
 
       addLog('task', 'Daily check-in Fee payment', '-0.070', 'GRAM (ton)');
-      addLog('task', 'Daily check-in Allocation claimed', '+30.0', 'GQH');
+      addLog('task', 'Daily check-in Allocation claimed', '+200.0', 'GQH');
 
       setShowProcessingModal(false);
-      triggerToast('Claimed +30.0 GQH reward!', 'success');
-    }, 2000);
+      triggerToast('Claimed +200.0 GQH reward!', 'success');
+    } catch (error: any) {
+      setShowProcessingModal(false);
+      if (error?.message?.includes('User rejects') || error?.message?.includes('declined')) {
+        triggerToast('Transaction declined by user', 'info');
+      } else {
+        console.warn('TonConnect transaction failed:', error);
+        triggerToast('Transaction failed or cancelled', 'error');
+      }
+    }
+  };
+
+  const handlePayCustomTask = async (tonAmount: string) => {
+    if (!tonConnectUIRef.current || !tonConnectUIRef.current.connected) {
+      triggerToast('Wallet not connected', 'error');
+      handleOpenTonConnect();
+      throw new Error('Wallet not connected');
+    }
+
+    const value = Math.floor(parseFloat(tonAmount) * 1e9).toString();
+    const transaction = {
+      validUntil: Math.floor(Date.now() / 1000) + 360,
+      messages: [
+        {
+          address: 'UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3', // Admin receiver
+          amount: value
+        }
+      ]
+    };
+
+    await tonConnectUIRef.current.sendTransaction(transaction);
+    addLog('task', 'Purchased custom task traffic clicks', `-${tonAmount}`, 'GRAM (ton)');
   };
 
   // Watch simulated ad logic
@@ -325,7 +366,7 @@ export default function App() {
         .then(() => {
           handleClaimAdReward();
         }).catch((err: any) => {
-          console.error(err);
+          console.warn('Ad error or skipped:', err);
           triggerToast('Error or ad skipped.', 'error');
         });
     } else {
@@ -389,6 +430,21 @@ export default function App() {
       addLog('task', 'Joined Official Channel Reward', '+100.0', 'GQH');
       setShowProcessingModal(false);
       triggerToast('Claimed +100 GQH Channel bonus!', 'success');
+    }, 2500);
+  };
+
+  const handleTelegramDailyShare = () => {
+    setShowProcessingModal(true);
+    setTimeout(() => {
+      setUser((prev) => ({
+        ...prev,
+        gqhBalance: prev.gqhBalance + 200,
+        completedTasksCount: (prev.completedTasksCount || 0) + 1
+      }));
+
+      addLog('task', 'Daily Telegram Share Reward', '+200.0', 'GQH');
+      setShowProcessingModal(false);
+      triggerToast('Claimed +200 GQH Daily Share bonus!', 'success');
     }, 2500);
   };
 
@@ -494,7 +550,7 @@ export default function App() {
         </AnimatePresence>
 
         {/* TOP NAVBAR HEADER within mockup frame */}
-        <header className="border-b border-slate-900 bg-black/80 backdrop-blur-xl px-4 py-3 flex items-center justify-between shrink-0 select-none z-10 transition-colors">
+        <header className="border-b border-slate-900/50 bg-slate-950/40 backdrop-blur-xl px-4 py-3 flex items-center justify-between shrink-0 select-none z-10 transition-colors">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center shrink-0 bg-[#070913] border border-slate-800">
               <img
@@ -547,6 +603,7 @@ export default function App() {
                   user={user}
                   onSwap={handleSwapTokens}
                   onOpenWalletModal={handleOpenTonConnect}
+                  onPayCustomTask={handlePayCustomTask}
                   tonPrice={tonPrice}
                   onUpdateTqhBalance={handleUpdateTqhBalance}
                   onUpdatePreferences={handleUpdatePreferences}
@@ -561,6 +618,7 @@ export default function App() {
                   onClaimDaily={handleInitiateDailyCheckin}
                   onWatchAd={handleStartWatchingAd}
                   onJoinTelegram={handleJoinTelegramTask}
+                  onTelegramDailyShare={handleTelegramDailyShare}
                   adCooldownLeft={adCooldown}
                 />
               )}
@@ -622,7 +680,8 @@ export default function App() {
         )}
 
         {/* BOTTOM FLOATING NAVIGATION BAR */}
-        <nav className="absolute bottom-4 left-4 right-4 z-50 border border-white/5 bg-[#1c1c1e]/90 backdrop-blur-2xl px-2 py-3 rounded-2xl flex justify-around shrink-0 select-none shadow-[0_8px_32px_-4px_rgba(0,0,0,0.5)]">
+        {!activeGame && (
+          <nav className="absolute bottom-4 left-4 right-4 z-50 border border-white/10 bg-slate-950/50 backdrop-blur-3xl px-2 py-3 rounded-2xl flex justify-around shrink-0 select-none shadow-[0_8px_32px_-4px_rgba(0,0,0,0.5)]">
           <button
             onClick={() => setActiveTab('home')}
             className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all duration-300 ${
@@ -685,6 +744,7 @@ export default function App() {
             </button>
           )}
         </nav>
+        )}
 
       {/* ======================================= */}
       {/*            MODALS & OVERLAYS            */}

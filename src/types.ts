@@ -26,7 +26,8 @@ export interface UserState {
 }
 
 export const PROFILE_BACKGROUNDS = [
-  null, // default solid gradient
+  "https://i.suar.me/X9eG5/l",
+  "https://i.suar.me/pM0r4/l",
   "https://i.suar.me/2zOW9/l",
   "https://i.suar.me/Lpozo/l",
   "https://i.suar.me/8zo1y/l",
