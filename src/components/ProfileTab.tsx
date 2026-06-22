@@ -54,18 +54,21 @@ export default function ProfileTab({
   return (
     <div className="space-y-4">
       {/* 1. Header Profile Box */}
-      <div className="flex flex-col items-center text-center space-y-2.5 bg-[#1c1c1e] border border-slate-800 p-4 rounded-2xl relative overflow-hidden shadow-sm">
+      <div className="flex flex-col items-center text-center space-y-2.5 bg-slate-900/50 border border-slate-700/50 p-6 rounded-3xl relative overflow-hidden shadow-2xl">
         {/* Background Image Layer */}
-        {PROFILE_BACKGROUNDS[profileBgIndex] && (
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-            style={{ backgroundImage: `url(${PROFILE_BACKGROUNDS[profileBgIndex]})` }}
-          />
+        {PROFILE_BACKGROUNDS[profileBgIndex] ? (
+          <>
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
+              style={{ backgroundImage: `url(${PROFILE_BACKGROUNDS[profileBgIndex]})` }}
+            />
+            {/* Carefully measured overlay: dark at bottom for text, lighter at top/middle to show image clearly */}
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/60 to-slate-950/95 z-0 pointer-events-none" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 z-0 pointer-events-none" />
         )}
-        
-        {/* Stronger overlay gradient for text readability with clear background */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1e] via-[#1c1c1e]/70 to-[#1c1c1e]/40 z-0" />
-        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-tr from-purple-500/10 to-indigo-500/5 rounded-full blur-xl pointer-events-none z-0" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-tr from-purple-500/10 to-indigo-500/10 rounded-full blur-3xl pointer-events-none z-0" />
 
         <div className="relative z-10">
           <div className="relative">

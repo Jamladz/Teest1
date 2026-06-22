@@ -33,66 +33,88 @@ export default function CardMatchGame({ onCollect, onExit }: CardMatchGameProps)
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMatching, setIsMatching] = useState(false);
 
-  const initializeDeck = useCallback(() => {
+  const startGame = useCallback(() => {
+    setScore(0);
+    setGameOver(false);
+    setWon(false);
+    setSlots([]);
+    setIsPlaying(true);
+    setIsMatching(false);
+    initializeDeck();
+  }, []);
+
+  const initializeDeck = () => {
     const newBoard: Card[] = [];
     const layers = 5;
-    const cardsPerLayerCount = 10;
-    // Generate enough cards in triplets to reasonably fill the board
-    const numTriplets = Math.floor((layers * cardsPerLayerCount) / 3);
-    const cardImageIds = Array.from({length: numTriplets * 3}, (_, i) => String(i % CARD_IMAGES.length));
+    const cardsPerLayerCount = 12; // 60 total
+    const totalCards = layers * cardsPerLayerCount;
+    // ensure multiple of 3
+    const numTriplets = totalCards / 3;
+    const cardImageIds = Array.from({length: totalCards}, (_, i) => String((Math.floor(i / 3)) % CARD_IMAGES.length));
     
-    // Shuffle cardImageIds
+    // Shuffle
     for (let i = cardImageIds.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [cardImageIds[i], cardImageIds[j]] = [cardImageIds[j], cardImageIds[i]];
     }
 
     let cardIdx = 0;
+    // Generate layered grid pattern instead of fully random scatter
     for (let l = 0; l < layers; l++) {
-      for (let i = 0; i < cardsPerLayerCount; i++) {
-        if (cardIdx >= cardImageIds.length) break;
-        const imageId = cardImageIds[cardIdx++];
-        newBoard.push({
-          id: `${l}-${i}`,
-          imageId: imageId,
-          imageUrl: CARD_IMAGES[parseInt(imageId)],
-          x: 10 + Math.random() * 75,
-          y: 5 + Math.random() * 65,
-          z: l,
-        });
+      // Alternate offsets to create interlocking tiles
+      const xOffset = l % 2 === 0 ? 0 : 9; 
+      const yOffset = l % 2 === 0 ? 0 : 7;
+
+      for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 3; col++) {
+          if (cardIdx >= cardImageIds.length) break;
+          const imageId = cardImageIds[cardIdx++];
+          
+          newBoard.push({
+            id: `${l}-${row}-${col}`,
+            imageId: imageId,
+            imageUrl: CARD_IMAGES[parseInt(imageId)],
+            x: 18 + (col * 23) + xOffset,
+            y: 12 + (row * 17) + yOffset,
+            z: l,
+          });
+        }
       }
     }
     
     setBoard(newBoard);
-    setSlots([]);
-    setScore(0);
-    setGameOver(false);
-    setWon(false);
-  }, []);
-
-  useEffect(() => {
-    initializeDeck();
-  }, [initializeDeck]);
+  };
 
   const isClickable = (card: Card) => {
     // Check if any higher layer card covers this one
     return !board.some(other => 
       other.z > card.z && 
-      Math.abs(other.x - card.x) < 8 &&
-      Math.abs(other.y - card.y) < 8
+      Math.abs(other.x - card.x) < 14 &&
+      Math.abs(other.y - card.y) < 14
     );
   };
 
   const handleCardClick = (card: Card) => {
-    if (gameOver || slots.length >= MAX_SLOTS || !isClickable(card)) return;
+    if (gameOver || isMatching || slots.length >= MAX_SLOTS || !isClickable(card)) return;
 
     // Remove from board
     const newBoard = board.filter(c => c.id !== card.id);
     setBoard(newBoard);
     
-    // Add to slots
-    const newSlots = [...slots, card];
+    // Add to slots, grouped by imageId
+    const newSlots = [...slots];
+    const lastIndex = newSlots.map(c => c.imageId).lastIndexOf(card.imageId);
+    
+    if (lastIndex !== -1) {
+      // Insert after the last matching item
+      newSlots.splice(lastIndex + 1, 0, card);
+    } else {
+      // Just push to the end
+      newSlots.push(card);
+    }
     
     // Check for matches
     const counts: Record<string, number> = {};
@@ -103,10 +125,22 @@ export default function CardMatchGame({ onCollect, onExit }: CardMatchGameProps)
     const matchFound = Object.entries(counts).find(([_, count]) => count === 3);
     
     if (matchFound) {
+      setIsMatching(true);
       const [imageId] = matchFound;
       const filteredSlots = newSlots.filter(c => c.imageId !== imageId);
-      setSlots(filteredSlots);
-      setScore(prev => prev + 100);
+      
+      // Delay it very slightly just to let the arrival animation play
+      setSlots(newSlots); // Temporarily show it
+      setTimeout(() => {
+        setSlots(currentSlots => currentSlots.filter(c => c.imageId !== imageId));
+        setScore(prev => prev + 100);
+        setIsMatching(false);
+        if (newBoard.length === 0) {
+          setWon(true);
+          setGameOver(true);
+          setScore(prev => prev + 1000);
+        }
+      }, 350); // wait for spring animation to finish
     } else {
       setSlots(newSlots);
       if (newSlots.length >= MAX_SLOTS) {
@@ -120,60 +154,165 @@ export default function CardMatchGame({ onCollect, onExit }: CardMatchGameProps)
   };
 
   return (
-    <div className="fixed inset-0 bg-[#050b26] z-50 flex flex-col items-center p-4 font-sans text-white">
-      <div className="w-full flex justify-between items-center mb-6 px-2">
-        <button onClick={onExit} className="p-2 bg-slate-800 rounded-full"><X className="w-5 h-5"/></button>
-        <div className="text-xl font-black">{score}</div>
-        <button onClick={initializeDeck} className="p-2 bg-slate-800 rounded-full"><RefreshCw className="w-5 h-5"/></button>
-      </div>
+    <div className="absolute inset-0 z-[2000] flex flex-col items-center bg-gradient-to-b from-[#1e1b4b] via-[#0f172a] to-[#050b26] font-sans text-white overflow-hidden">
+      {/* Start screen container */}
+      {!isPlaying && !gameOver && (
+        <div className="absolute inset-0 bg-[#0f172a]/95 flex flex-col items-center justify-center p-6 text-center z-[2005]">
+          <div className="max-w-md w-full flex flex-col items-center gap-6">
+            <div className="w-20 h-20 bg-gradient-to-tr from-sky-400 to-indigo-600 rounded-3xl flex items-center justify-center shadow-lg shadow-sky-500/20">
+              <img src="https://i.suar.me/lZWm5/l" alt="Icon" className="w-12 h-12 object-cover rounded-xl" />
+            </div>
 
-      <div className="flex-1 w-full relative">
-        {board.map((card) => {
-          const clickable = isClickable(card);
-          return (
-            <motion.button
-              key={card.id}
-              onClick={() => handleCardClick(card)}
-              className={`absolute w-14 h-14 rounded-xl overflow-hidden border-2 ${clickable ? 'border-sky-300 shadow-lg shadow-sky-900/50' : 'border-slate-800 brightness-[0.3] cursor-not-allowed'}`}
-              style={{
-                left: `${card.x}%`,
-                top: `${card.y}%`,
-                zIndex: card.z,
-              }}
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              whileHover={clickable ? { scale: 1.15, rotate: 2 } : {}}
-              whileTap={clickable ? { scale: 0.9 } : {}}
-            >
-              <img src={card.imageUrl} alt="card" className="w-full h-full object-cover"/>
-            </motion.button>
-          );
-        })}
-      </div>
+            <div>
+              <h2 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-sky-300 via-white to-sky-300 bg-clip-text text-transparent">
+                TOKEN MATCHER
+              </h2>
+              <p className="text-sm text-slate-400 mt-2 max-w-sm">
+                Match three identical images to clear the board. Be careful not to fill up the slot bar!
+              </p>
+            </div>
 
-      <div className="w-full bg-[#050b26]/50 rounded-2xl p-3 flex -space-x-3 items-center justify-center border-2 border-slate-800 mt-auto">
-        {slots.map((card, idx) => (
-          <div key={idx} className="w-12 h-12 bg-slate-800 rounded-lg overflow-hidden border-2 border-slate-950 flex-shrink-0">
-            <img src={card.imageUrl} alt="slot" className="w-full h-full object-cover" />
-          </div>
-        ))}
-        {Array.from({ length: MAX_SLOTS - slots.length }).map((_, i) => (
-          <div key={i} className="w-12 h-12 bg-slate-950 rounded-lg border-2 border-slate-800 flex-shrink-0" />
-        ))}
-      </div>
-
-      <AnimatePresence>
-        {gameOver && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-            <div className="bg-slate-900 p-8 rounded-3xl text-center border border-slate-700 w-full max-w-sm mx-4">
-              <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-              <h2 className="text-3xl font-black mb-2">{won ? 'You Won!' : 'Game Over'}</h2>
-              <p className="text-lg font-bold mb-6">Score: {score}</p>
-              <div className="flex gap-4">
-                <button onClick={initializeDeck} className="flex-1 py-3 bg-slate-700 rounded-xl font-bold">إعادة</button>
-                <button onClick={() => onCollect(score)} className="flex-1 py-3 bg-blue-600 rounded-xl font-bold">جمع</button>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl flex flex-col items-center">
+                <Trophy className="w-5 h-5 text-yellow-400 mb-1" />
+                <span className="text-xs text-slate-400 uppercase">HIGH SCORE</span>
+                <span className="text-lg font-bold text-white mt-1">-</span>
+              </div>
+              <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl flex flex-col items-center">
+                <RefreshCw className="w-5 h-5 text-emerald-400 mb-1" />
+                <span className="text-xs text-slate-400 uppercase">LAYERS</span>
+                <span className="text-lg font-bold text-white mt-1">5</span>
               </div>
             </div>
+
+            <button
+              onClick={startGame}
+              className="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-black text-xl py-5 rounded-2xl shadow-[0_0_40px_rgba(56,189,248,0.4)] transition-all transform hover:scale-[1.02] active:scale-95 uppercase tracking-wider"
+            >
+              START GAME
+            </button>
+            <button onClick={onExit} className="text-slate-400 text-sm font-bold mt-2 hover:text-white transition-colors">
+              CANCEL
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Top Header */}
+      <div className="w-full max-w-lg mx-auto flex justify-between items-center p-4">
+        <button onClick={onExit} className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-full backdrop-blur-sm hover:bg-white/10 transition-colors">
+          <X className="w-5 h-5 text-slate-300"/>
+        </button>
+        <div className="flex flex-col items-center">
+          <span className="text-[10px] text-sky-400 font-bold tracking-widest uppercase">SCORE</span>
+          <div className="text-2xl font-black text-white drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]">{score}</div>
+        </div>
+        <button onClick={initializeDeck} className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-full backdrop-blur-sm hover:bg-white/10 transition-colors">
+          <RefreshCw className="w-5 h-5 text-slate-300"/>
+        </button>
+      </div>
+
+      {/* Board */}
+      <div className="w-full max-w-sm aspect-[3/4] relative mx-auto my-auto self-center">
+        <AnimatePresence>
+          {board.map((card) => {
+            const clickable = isClickable(card);
+            return (
+              <motion.button
+                key={card.id}
+                layoutId={card.id}
+                onClick={() => handleCardClick(card)}
+                className={`absolute w-[21%] aspect-square rounded-xl overflow-hidden transition-all duration-300 flex items-center justify-center p-1 ${
+                  clickable 
+                  ? 'bg-gradient-to-br from-indigo-50 to-white border-[2px] border-indigo-200 hover:border-indigo-400 hover:-translate-y-1 shadow-[0_4px_12px_rgba(0,0,0,0.15)] z-20 hover:z-50 cursor-pointer' 
+                  : 'bg-slate-200 border-[2px] border-slate-300 brightness-75 cursor-not-allowed shadow-sm'
+                }`}
+                style={{
+                  left: `${card.x}%`,
+                  top: `${card.y}%`,
+                  zIndex: card.z + (clickable ? 10 : 0),
+                  pointerEvents: clickable ? 'auto' : 'none',
+                }}
+                initial={{ scale: 0, opacity: 0, y: -40 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0, opacity: 0, transition: { duration: 0.2 } }}
+                whileTap={clickable ? { scale: 0.95 } : {}}
+              >
+                <div className="w-full h-full rounded-lg bg-white flex items-center justify-center relative overflow-hidden">
+                  <img src={card.imageUrl} alt="card" className="w-full h-full object-cover shrink-0"/>
+                </div>
+              </motion.button>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      {/* Slot Container */}
+      <div className="w-[94%] max-w-md mx-auto mb-16 sm:mb-20 bg-slate-900/95 backdrop-blur-2xl rounded-2xl p-2.5 sm:p-3 flex gap-1.5 sm:gap-2 items-center justify-center border border-slate-700 shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-10 box-border h-[80px] sm:h-[90px]">
+        <AnimatePresence mode="popLayout">
+          {slots.map((card) => (
+            <motion.div
+              key={card.id}
+              layoutId={card.id}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 25 } }}
+              exit={{ scale: 0, opacity: 0, transition: { duration: 0.2 } }}
+              className="flex-1 max-w-[13.5%] h-full bg-white rounded-xl overflow-hidden border-[2px] border-indigo-200 shadow-sm flex-shrink-0 flex items-center justify-center p-1"
+            >
+              <div className="w-full h-full rounded-lg overflow-hidden bg-slate-50 flex items-center justify-center relative">
+                <img src={card.imageUrl} alt="slot" className="w-full h-full object-cover" />
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+        {Array.from({ length: MAX_SLOTS - slots.length }).map((_, i) => (
+          <div key={`empty-${slots.length + i}`} className="flex-1 max-w-[13.5%] h-full bg-slate-800/80 rounded-xl border border-slate-600/50 border-dashed flex-shrink-0 shadow-inner" />
+        ))}
+      </div>
+
+      {/* Game Over Modal */}
+      <AnimatePresence>
+        {gameOver && (
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="absolute inset-0 bg-[#0f172a]/97 flex flex-col items-center justify-center p-6 text-center z-[2005]">
+            <motion.div initial={{scale:0.95, y: 20}} animate={{scale:1, y: 0}} className="max-w-sm w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl flex flex-col items-center gap-6 shadow-2xl">
+              <h2 className={`text-2xl font-black tracking-wider uppercase ${won ? 'text-emerald-400' : 'text-rose-500'}`}>
+                {won ? 'YOU WON!' : 'GAME OVER'}
+              </h2>
+              <p className="text-slate-400 text-sm -mt-3">
+                {won ? 'You successfully matched all tokens!' : 'Your slot bar is full!'}
+              </p>
+
+              <div className="w-full space-y-3">
+                <div className="bg-slate-800/40 p-4 rounded-2xl flex justify-between items-center">
+                  <span className="text-sm text-slate-400">Total Score:</span>
+                  <span className="text-lg font-bold text-white">{score}</span>
+                </div>
+
+                <div className="bg-emerald-900/20 border border-emerald-800/40 p-4 rounded-2xl flex justify-between items-center">
+                  <span className="text-sm text-emerald-400 font-semibold">Reward Earned:</span>
+                  <span className="text-lg font-bold text-emerald-400">+{Math.floor(score / 50)} GQH</span>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-500">
+                Exchange rate: 50 points = 1 GQH!
+              </p>
+
+              <div className="flex gap-3 w-full mt-2">
+                <button
+                  onClick={startGame}
+                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 rounded-2xl transition-colors uppercase tracking-wide"
+                >
+                  RETRY
+                </button>
+                <button
+                  onClick={() => onCollect(score)}
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl shadow-lg transition-transform active:scale-95 uppercase tracking-wide"
+                >
+                  COLLECT
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

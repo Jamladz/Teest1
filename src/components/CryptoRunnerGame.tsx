@@ -143,7 +143,7 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
   const jump = () => {
     if (!isPlaying) return;
     if (!playerRef.current.isJumping) {
-      playerRef.current.vy = -13.5;
+      playerRef.current.vy = -11.5;
       playerRef.current.isJumping = true;
       playJumpSound();
     }
@@ -153,7 +153,7 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
     setScore(0);
     setGameOver(false);
     setIsPlaying(true);
-    gameSpeed.current = 5;
+    gameSpeed.current = 4.5;
     obstaclesRef.current = [];
     coinsRef.current = [];
     tickerRef.current = 0;
@@ -189,7 +189,7 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
 
     let localFrameId: number;
     const groundY = canvas.height - 100;
-    const gravity = 0.65;
+    const gravity = 0.5;
 
     const gameLoop = () => {
       ctx.fillStyle = '#0f172a';
@@ -209,7 +209,7 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
 
       // Obstacle & Coin spawning logic
       tickerRef.current++;
-      if (tickerRef.current % 110 === 0) {
+      if (tickerRef.current % 130 === 0) {
         const types: Obstacle['type'][] = ['red_candle', 'barricade'];
         const chosenType = types[Math.floor(Math.random() * types.length)];
         obstaclesRef.current.push({
@@ -220,10 +220,10 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
         });
 
         // Speed ramp up slightly
-        gameSpeed.current = Math.min(10, gameSpeed.current + 0.12);
+        gameSpeed.current = Math.min(9, gameSpeed.current + 0.08);
       }
 
-      if (tickerRef.current % 70 === 0) {
+      if (tickerRef.current % 80 === 0) {
         coinsRef.current.push({
           x: canvas.width + 50,
           y: groundY - 60 - Math.random() * 80,
@@ -315,7 +315,7 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
         ctx.shadowBlur = 0;
 
         // Collision box checks
-        const pRadius = player.radius;
+        const pRadius = player.radius * 0.75;
         const pX = 50;
         const pY = player.y;
 
@@ -388,7 +388,7 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 bg-[#0f172a] text-slate-100 flex flex-col z-[2000] overflow-hidden justify-center items-center"
+      className="absolute inset-0 bg-[#0f172a] text-slate-100 flex flex-col z-[2000] overflow-hidden justify-center items-center"
     >
       <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-[2001] px-2">
         <div className="flex gap-2">

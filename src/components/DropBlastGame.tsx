@@ -47,7 +47,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
   });
 
   // Game Engine logic references
-  const playerRef = useRef({ x: 0, size: 55, targetX: 0 });
+  const playerRef = useRef({ x: 0, size: 85, targetX: 0 });
   const objectsRef = useRef<GameObject[]>([]);
   const particlesRef = useRef<Particle[]>([]);
   const isMovingLeft = useRef(false);
@@ -56,6 +56,26 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
   const bombActiveRef = useRef(false);
   const freezeTimerRef = useRef(0);
   const bombTimerRef = useRef(0);
+
+  // Custom Image Refs
+  const coinImgRef = useRef<HTMLImageElement | null>(null);
+  const timeImgRef = useRef<HTMLImageElement | null>(null);
+  const frogImgRef = useRef<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    // Preload custom requested images
+    const coinImg = new Image();
+    coinImg.src = 'https://i.suar.me/2zOKw/l';
+    coinImgRef.current = coinImg;
+
+    const timeImg = new Image();
+    timeImg.src = 'https://i.suar.me/a9xWd/l';
+    timeImgRef.current = timeImg;
+
+    const frogImg = new Image();
+    frogImg.src = 'https://i.suar.me/1zNmX/l';
+    frogImgRef.current = frogImg;
+  }, []);
 
   // Keep references for dynamic event loops
   const requestRef = useRef<number | null>(null);
@@ -195,6 +215,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
     // Timer Interval
     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
     timerIntervalRef.current = setInterval(() => {
+      if (freezeActiveRef.current) return; // Pause time
       setTimeLeft((prev) => {
         if (prev <= 1) {
           endGame();
@@ -343,29 +364,16 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
         ctx.shadowBlur = 0;
 
         if (obj.type === 'coin') {
-          // Inner Golden/Blue coin
-          ctx.beginPath();
-          ctx.arc(0, 0, obj.size, 0, Math.PI * 2);
-          const gradient = ctx.createRadialGradient(-2, -2, 1, 0, 0, obj.size);
-          gradient.addColorStop(0, '#ffe066');
-          gradient.addColorStop(0.3, '#f59e0b');
-          gradient.addColorStop(1, '#d97706');
-          ctx.fillStyle = gradient;
-          ctx.shadowColor = '#ffe066';
-          ctx.shadowBlur = 10;
-          ctx.fill();
-
-          ctx.strokeStyle = '#d97706';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-
-          // Standard letter icon
-          ctx.rotate(-obj.angle); // Draw upright Q/T symbol
-          ctx.fillStyle = '#fff';
-          ctx.font = 'bold 12px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText('Q', 0, 0);
+          if (coinImgRef.current && coinImgRef.current.complete) {
+            ctx.rotate(-obj.angle);
+            ctx.drawImage(coinImgRef.current, -obj.size * 1.5, -obj.size * 1.5, obj.size * 3, obj.size * 3);
+          } else {
+            // Fallback
+            ctx.beginPath();
+            ctx.arc(0, 0, obj.size, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffe066';
+            ctx.fill();
+          }
         } else if (obj.type === 'star') {
           // Sparkling Diamond/Star
           ctx.beginPath();
@@ -386,24 +394,29 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
           ctx.textBaseline = 'middle';
           ctx.fillText('★', 0, 0);
         } else if (obj.type === 'freeze') {
-          // Freeze Snowflake Icebox
-          ctx.fillStyle = '#38bdf8';
-          ctx.shadowColor = '#0ea5e9';
-          ctx.shadowBlur = 12;
-          ctx.beginPath();
-          ctx.arc(0, 0, obj.size, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Blue center icon
-          ctx.fillStyle = '#0284c7';
-          ctx.beginPath();
-          ctx.moveTo(0, -6);
-          ctx.lineTo(0, 6);
-          ctx.moveTo(-6, 0);
-          ctx.lineTo(6, 0);
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 2;
-          ctx.stroke();
+          if (timeImgRef.current && timeImgRef.current.complete) {
+            ctx.rotate(-obj.angle);
+            ctx.drawImage(timeImgRef.current, -obj.size * 1.5, -obj.size * 1.5, obj.size * 3, obj.size * 3);
+          } else {
+            // Freeze Snowflake Icebox
+            ctx.fillStyle = '#38bdf8';
+            ctx.shadowColor = '#0ea5e9';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(0, 0, obj.size, 0, Math.PI * 2);
+            ctx.fill();
+  
+            // Blue center icon
+            ctx.fillStyle = '#0284c7';
+            ctx.beginPath();
+            ctx.moveTo(0, -6);
+            ctx.lineTo(0, 6);
+            ctx.moveTo(-6, 0);
+            ctx.lineTo(6, 0);
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
         } else if (obj.type === 'bomb') {
           // Hazard Spike/Bomb
           ctx.fillStyle = '#ef4444';
@@ -465,42 +478,53 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
         return obj.y < canvas.height + 30;
       });
 
-      // 6. Draw Player (A Glassmorphism Basket / Catching Shield)
+      // 6. Draw Player
       const playerX = playerRef.current.x;
       const playerY = canvas.height - 100;
       const playerWidth = playerRef.current.size;
 
-      // Outer glow of the shield
-      ctx.shadowColor = freezeActiveRef.current ? '#38bdf8' : '#0078ff';
-      ctx.shadowBlur = 15;
-      ctx.strokeStyle = freezeActiveRef.current ? 'rgba(56, 189, 248, 0.8)' : 'rgba(0, 120, 255, 0.8)';
-      ctx.lineWidth = 4;
+      if (frogImgRef.current && frogImgRef.current.complete) {
+        ctx.shadowColor = freezeActiveRef.current ? '#38bdf8' : 'transparent';
+        ctx.shadowBlur = freezeActiveRef.current ? 20 : 0;
+        ctx.drawImage(frogImgRef.current, playerX - playerWidth / 2, playerY - playerWidth / 2 - 10, playerWidth, playerWidth);
+        ctx.shadowBlur = 0;
+      } else {
+        // Fallback Inner glow
+        const basketGradient = ctx.createLinearGradient(playerX, playerY, playerX, playerY + playerWidth);
+        basketGradient.addColorStop(0, freezeActiveRef.current ? 'rgba(56, 189, 248, 0.4)' : 'rgba(0, 120, 255, 0.4)');
+        basketGradient.addColorStop(1, freezeActiveRef.current ? 'rgba(56, 189, 248, 0.1)' : 'rgba(0, 120, 255, 0.1)');
 
-      ctx.beginPath();
-      ctx.arc(playerX, playerY - 10, playerWidth / 2, 0, Math.PI, false); // curved basket
-      ctx.stroke();
+        ctx.fillStyle = basketGradient;
+        ctx.beginPath();
+        ctx.arc(playerX, playerY - 10, playerWidth / 2 + 5, 0, Math.PI, false);
+        ctx.fill();
 
-      // Filled basket
-      ctx.fillStyle = 'rgba(30, 41, 59, 0.6)';
-      ctx.beginPath();
-      ctx.arc(playerX, playerY - 10, playerWidth / 2, 0, Math.PI, false);
-      ctx.fill();
+        // Outer glow of the shield
+        ctx.shadowColor = freezeActiveRef.current ? '#38bdf8' : '#0078ff';
+        ctx.shadowBlur = 20;
+        ctx.strokeStyle = freezeActiveRef.current ? 'rgba(186, 230, 253, 0.9)' : 'rgba(147, 197, 253, 0.9)';
+        ctx.lineWidth = 5;
 
-      // Top bar of the shield
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#fff';
-      ctx.beginPath();
-      ctx.moveTo(playerX - playerWidth / 2, playerY - 10);
-      ctx.lineTo(playerX + playerWidth / 2, playerY - 10);
-      ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(playerX, playerY - 10, playerWidth / 2 + 5, 0, Math.PI, false); // curved basket
+        ctx.stroke();
 
-      ctx.shadowBlur = 0; // reset
+        // Top bar of the shield
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(playerX - playerWidth / 2 - 5, playerY - 10);
+        ctx.lineTo(playerX + playerWidth / 2 + 5, playerY - 10);
+        ctx.stroke();
 
-      // Draw standard GRAM or GQH logo decoration inside the basket
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-      ctx.font = '9px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('SHIELD', playerX, playerY + 5);
+        ctx.shadowBlur = 0; // reset
+
+        // Draw standard GRAM or GQH logo decoration inside the basket
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(freezeActiveRef.current ? '❄️' : '🛡️', playerX, playerY + 5);
+      }
 
       frameId = requestAnimationFrame(loop);
     };
@@ -547,19 +571,20 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 bg-[#0f172a] text-slate-100 flex flex-col z-[2000] overflow-hidden"
+      className="absolute inset-0 bg-[#0f172a] text-slate-100 flex flex-col z-[2000] overflow-hidden"
     >
       {/* Game Headings/UI HUD */}
       <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-auto z-[2001] px-2">
         <div className="flex gap-2">
           <div className="bg-slate-900/80 border border-slate-700/50 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-2">
-            <span className="w-2.5 h-2.5 bg-yellow-400 rounded-full animate-pulse" />
-            <span className="text-xs text-slate-400">Score:</span>
+            <img src="https://i.suar.me/2zOKw/l" alt="Coin" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]" />
+            <span className="text-xs text-slate-400 hidden md:inline">Score:</span>
             <span className="font-bold text-yellow-400 text-sm md:text-base">{score}</span>
           </div>
 
           <div className="bg-slate-900/80 border border-slate-700/50 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-2">
-            <span className="text-xs text-slate-400">Time:</span>
+            <img src="https://i.suar.me/a9xWd/l" alt="Time" className="w-4 h-4 object-contain brightness-150 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]" />
+            <span className="text-xs text-slate-400 hidden md:inline">Time:</span>
             <span className={`font-mono font-bold text-sm ${timeLeft <= 10 ? 'text-red-400 animate-pulse' : 'text-slate-200'}`}>
               {timeLeft}s
             </span>
@@ -589,32 +614,8 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
         ref={canvasRef}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
-        className="w-full h-full cursor-pointer touch-none"
+        className="w-full h-full cursor-grab active:cursor-grabbing touch-none"
       />
-
-      {/* ON-SCREEN OVERLAYS AND MOVEMENT CONTROLLERS FOR TOUCH SCREENS */}
-      {isPlaying && (
-        <div className="absolute bottom-6 left-0 right-0 flex justify-between px-6 pointer-events-auto z-[2001]">
-          <button
-            onTouchStart={() => (isMovingLeft.current = true)}
-            onTouchEnd={() => (isMovingLeft.current = false)}
-            onMouseDown={() => (isMovingLeft.current = true)}
-            onMouseUp={() => (isMovingLeft.current = false)}
-            className="w-20 h-20 bg-slate-800/70 border border-slate-700/70 active:bg-slate-700/90 rounded-2xl flex items-center justify-center font-bold text-2xl select-none"
-          >
-            ◀
-          </button>
-          <button
-            onTouchStart={() => (isMovingRight.current = true)}
-            onTouchEnd={() => (isMovingRight.current = false)}
-            onMouseDown={() => (isMovingRight.current = true)}
-            onMouseUp={() => (isMovingRight.current = false)}
-            className="w-20 h-20 bg-slate-800/70 border border-slate-700/70 active:bg-slate-700/90 rounded-2xl flex items-center justify-center font-bold text-2xl select-none"
-          >
-            ▶
-          </button>
-        </div>
-      )}
 
       {/* Start Screen Game Portal Overlay */}
       {!isPlaying && !gameOver && (
@@ -629,7 +630,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
                 BB DROP BLAST
               </h2>
               <p className="text-sm text-slate-400 mt-2 max-w-sm">
-                Catch gold coins & crystal stars in your defensive shield, freeze time with snowflakes, and don't catch bombs!
+                Catch gold coins & crystal stars using your frog character, collect freeze items to pause time, and don't catch bombs!
               </p>
             </div>
 

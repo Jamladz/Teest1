@@ -1,12 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, PlayCircle, Send, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import { Calendar, PlayCircle, Send, CheckCircle2, AlertCircle, Clock, ExternalLink } from 'lucide-react';
 import { UserState } from '../types';
+
+interface CustomTask {
+  id: string;
+  title: string;
+  description: string;
+  link: string;
+  clicksCount: number;
+  status: 'pending' | 'approved';
+  createdAt: number;
+}
 
 interface TasksTabProps {
   user: UserState;
   onClaimDaily: () => void;
   onWatchAd: () => void;
   onJoinTelegram: () => void;
+  onTelegramDailyShare: () => void;
   adCooldownLeft: number;
 }
 
@@ -15,9 +26,94 @@ export default function TasksTab({
   onClaimDaily,
   onWatchAd,
   onJoinTelegram,
+  onTelegramDailyShare,
   adCooldownLeft,
 }: TasksTabProps) {
   const [dailyCountdownStr, setDailyCountdownStr] = useState('');
+  const [customTasks, setCustomTasks] = useState<CustomTask[]>([]);
+  const [completedCustomTasks, setCompletedCustomTasks] = useState<string[]>([]);
+  const [completedPartnerTasks, setCompletedPartnerTasks] = useState<string[]>([]);
+  
+  const [telegramShareCount, setTelegramShareCount] = useState<number>(0);
+  const [lastTelegramShareAt, setLastTelegramShareAt] = useState<string | null>(null);
+
+  useEffect(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const sharesDate = localStorage.getItem('gqh_last_tg_share_date');
+    
+    if (sharesDate === todayStr) {
+      setTelegramShareCount(parseInt(localStorage.getItem('gqh_tg_share_count') || '0'));
+      setLastTelegramShareAt(localStorage.getItem('gqh_last_tg_share_at'));
+    } else {
+      setTelegramShareCount(0);
+      setLastTelegramShareAt(null);
+    }
+  }, []);
+
+  const handleShareClick = () => {
+    // Open Telegram share link directly first
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent('Join me on GramQash and earn GQH!')}`);
+
+    setTimeout(() => {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const nowStr = new Date().toISOString();
+      
+      let currentCount = telegramShareCount;
+      if (localStorage.getItem('gqh_last_tg_share_date') !== todayStr) {
+         currentCount = 0;
+      }
+      
+      const nextCount = Math.min(currentCount + 1, 4);
+      setTelegramShareCount(nextCount);
+      setLastTelegramShareAt(nowStr);
+      
+      localStorage.setItem('gqh_last_tg_share_date', todayStr);
+      localStorage.setItem('gqh_tg_share_count', nextCount.toString());
+      localStorage.setItem('gqh_last_tg_share_at', nowStr);
+      
+      if (nextCount === 4 && currentCount < 4) {
+        onTelegramDailyShare();
+      }
+    }, 1000);
+  };
+
+  useEffect(() => {
+    const fetchCustomTasks = () => {
+      const stored = localStorage.getItem('gqh_custom_tasks');
+      if (stored) {
+        const parsed: CustomTask[] = JSON.parse(stored);
+        setCustomTasks(parsed.filter(t => t.status === 'approved'));
+      }
+      const completed = localStorage.getItem('gqh_completed_custom_tasks');
+      if (completed) {
+        setCompletedCustomTasks(JSON.parse(completed));
+      }
+      const completedPartner = localStorage.getItem('gqh_completed_partner_tasks');
+      if (completedPartner) {
+        setCompletedPartnerTasks(JSON.parse(completedPartner));
+      }
+    };
+
+    fetchCustomTasks();
+
+    const handleUpdate = () => fetchCustomTasks();
+    window.addEventListener('gqh_tasks_updated', handleUpdate);
+    return () => window.removeEventListener('gqh_tasks_updated', handleUpdate);
+  }, []);
+
+  const handleCompleteCustomTask = (taskId: string) => {
+    const updated = [...completedCustomTasks, taskId];
+    setCompletedCustomTasks(updated);
+    localStorage.setItem('gqh_completed_custom_tasks', JSON.stringify(updated));
+    // simulate earning some points locally via dispatch/context if wanted, but fine to just show complete
+  };
+
+  const handleCompletePartnerTask = (taskId: string) => {
+    const updated = [...completedPartnerTasks, taskId];
+    setCompletedPartnerTasks(updated);
+    localStorage.setItem('gqh_completed_partner_tasks', JSON.stringify(updated));
+    // simulate earning locally
+  };
 
   // Daily Check-in Countdown helper
   useEffect(() => {
@@ -66,7 +162,7 @@ export default function TasksTab({
             <div>
               <h3 className="font-extrabold text-slate-100 text-sm">Daily Check-in</h3>
               <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                Settle minor GRAM gas fee to claim your daily allocation of 30 GQH. Refreshed daily.
+                Settle minor GRAM gas fee to claim your daily allocation of 200 GQH. Refreshed daily.
               </p>
             </div>
           </div>
@@ -75,7 +171,7 @@ export default function TasksTab({
         <div className="flex items-center justify-between pt-2.5 border-t border-slate-800">
           <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-semibold">
             <span className="text-green-500 font-bold bg-green-500/10 px-2.5 py-1 rounded-full">
-              +30 GQH
+              +200 GQH
             </span>
             <span>Fee: 0.07 GRAM</span>
           </div>
@@ -143,44 +239,161 @@ export default function TasksTab({
         </div>
       </div>
 
-      {/* 3. Join Telegram Channel Task Card */}
+      {/* 4. Daily Telegram Share Task Card */}
       <div className="bg-gradient-to-br from-[#0e163d]/50 via-[#070b1e]/50 to-[#0b102c]/50 border border-blue-550/20 p-4 rounded-2xl relative overflow-hidden space-y-3.5 shadow-xl">
         <div className="flex items-start justify-between">
           <div className="flex gap-3">
-            <div className="w-10 h-10 bg-sky-500/15 text-sky-400 rounded-xl flex items-center justify-center border border-sky-500/20 shrink-0">
-              <Send className="w-5 h-5 text-sky-400 animate-pulse" />
+            <div className="w-10 h-10 bg-blue-500/15 text-blue-400 rounded-xl flex items-center justify-center border border-blue-500/20 shrink-0">
+              <Send className="w-5 h-5 text-blue-400 animate-pulse" />
             </div>
             <div>
-              <h3 className="font-extrabold text-slate-100 text-sm">Join Official Channel</h3>
+              <h3 className="font-extrabold text-slate-100 text-sm">Daily Telegram Share</h3>
               <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                Subscribe to our main updates and drop alert community! Claim 100 GQH instantly.
+                Share inside Telegram 4 times daily to claim 200 GQH!
               </p>
             </div>
           </div>
         </div>
 
         <div className="flex items-center justify-between pt-2.5 border-t border-slate-800">
-          <div className="text-[10px] text-slate-400 font-semibold">
+          <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-semibold">
             <span className="text-green-500 font-bold bg-green-500/10 px-2.5 py-1 rounded-full">
-              +100 GQH
+              +200 GQH
+            </span>
+            <span className="text-slate-400 bg-slate-800 px-2.5 py-1 rounded-full">
+              {telegramShareCount}/4 Shares
             </span>
           </div>
 
-          {user.telegramJoined ? (
+          {telegramShareCount >= 4 ? (
             <span className="text-[10px] text-green-500 font-bold bg-green-500/15 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 border border-emerald-500/15 shadow-sm">
               <CheckCircle2 className="w-3.5 h-3.5" />
               Completed
             </span>
           ) : (
             <button
-              onClick={onJoinTelegram}
-              className="bg-sky-500 hover:bg-sky-600 py-2 px-3.5 rounded-lg text-[11px] font-extrabold text-white shadow-lg"
+              onClick={handleShareClick}
+              className="bg-blue-600 hover:bg-blue-700 py-2 px-3.5 rounded-lg text-[11px] font-extrabold text-white shadow-lg flex items-center gap-1 active:scale-95 transition-transform"
             >
-              Join Channel
+              Share Now
             </button>
           )}
         </div>
       </div>
+
+      {/* 5. App / Partner Tasks */}
+      <div className="pt-4 mt-4 border-t border-slate-800 space-y-4">
+        <div className="text-left">
+          <h2 className="text-lg font-black text-white tracking-tight">App Tasks</h2>
+          <p className="text-[11px] text-slate-400 mt-0.5">Explore our partner apps & games to earn more! (+100 GQH EACH)</p>
+        </div>
+
+        {[
+          { id: 'partner-gorilla', title: 'Play GorillaCaseBot', link: 'https://t.me/GorillaCaseBot/app?startapp=r_1368899842', desc: 'Join GorillaCaseBot and discover amazing rewards!' },
+          { id: 'partner-rolls', title: 'Play RollsGameBot', link: 'https://t.me/rollsgame_bot/app?startapp=ref_CTqRaJiPLK', desc: 'Roll the dice and win big with RollsGameBot!' },
+          { id: 'partner-gamee', title: 'Play Gamee', link: 'https://t.me/gamee/start?startapp=eyJyZWYiOjEzNjg4OTk4NDJ9', desc: 'Play exciting games on Gamee!' }
+        ].map(task => {
+          const isCompleted = completedPartnerTasks.includes(task.id);
+          return (
+            <div key={task.id} className="bg-gradient-to-br from-[#0e163d]/50 via-[#070b1e]/50 to-[#0b102c]/50 border border-purple-550/20 p-4 rounded-2xl relative overflow-hidden space-y-3.5 shadow-xl">
+              <div className="flex items-start justify-between">
+                <div className="flex gap-3">
+                  <div className="w-10 h-10 bg-purple-500/15 text-purple-400 rounded-xl flex items-center justify-center border border-purple-500/20 shrink-0">
+                    <PlayCircle className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-100 text-sm">{task.title}</h3>
+                    <p className="text-[11px] text-slate-400 mt-0.5 leading-snug line-clamp-2">
+                      {task.desc}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2.5 border-t border-slate-800">
+                <div className="text-[10px] text-slate-400 font-semibold">
+                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                    +100 GQH
+                  </span>
+                </div>
+
+                {isCompleted ? (
+                  <span className="text-[10px] text-green-500 font-bold bg-green-500/15 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 border border-emerald-500/15 shadow-sm">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Completed
+                  </span>
+                ) : (
+                  <a
+                    href={task.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => handleCompletePartnerTask(task.id)}
+                    className="bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-lg text-[11px] font-extrabold text-white shadow-lg active:scale-95 transition-transform text-center inline-block"
+                  >
+                    Play
+                  </a>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 6. Custom User Added Tasks */}
+      {customTasks.length > 0 && (
+        <div className="pt-4 mt-4 border-t border-slate-800 space-y-4">
+          <div className="text-left">
+            <h2 className="text-lg font-black text-white tracking-tight">Community Tasks</h2>
+            <p className="text-[11px] text-slate-400 mt-0.5">Tasks created by the community.</p>
+          </div>
+
+          {customTasks.map((task) => {
+            const isCompleted = completedCustomTasks.includes(task.id);
+            return (
+              <div key={task.id} className="bg-gradient-to-br from-[#0e163d]/30 via-[#070b1e]/30 to-[#0b102c]/30 border border-slate-700/50 p-4 rounded-2xl relative overflow-hidden space-y-3.5 shadow-md">
+                <div className="flex items-start justify-between">
+                  <div className="flex gap-3">
+                    <div className="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center border border-emerald-500/20 shrink-0">
+                      <ExternalLink className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-slate-100 text-sm">{task.title}</h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5 leading-snug line-clamp-2">
+                        {task.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2.5 border-t border-slate-800/50">
+                  <div className="text-[10px] text-slate-400 font-semibold">
+                    <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                      +10 GQH
+                    </span>
+                  </div>
+
+                  {isCompleted ? (
+                    <span className="text-[10px] text-green-500 font-bold bg-green-500/15 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 border border-emerald-500/15">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Done
+                    </span>
+                  ) : (
+                    <a
+                      href={task.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => handleCompleteCustomTask(task.id)}
+                      className="bg-emerald-500 hover:bg-emerald-600 py-2 px-4 rounded-lg text-[11px] font-extrabold text-white shadow-lg transition-transform active:scale-95 text-center"
+                    >
+                      Complete
+                    </a>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

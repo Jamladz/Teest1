@@ -8,12 +8,15 @@ interface HomeTabProps {
   user: UserState;
   onSwap: (gqhAmount: number, tonReceived: number) => void;
   onOpenWalletModal: () => void;
+  onPayCustomTask?: (tonAmount: string) => Promise<void>;
   tonPrice: number;
   onUpdateTqhBalance?: (newAmount: number) => void;
   onUpdatePreferences?: (haptic: boolean, sound: boolean) => void;
   onShowToast?: (message: string, type: 'success' | 'error' | 'info') => void;
   profileBgIndex?: number;
 }
+
+import { TaskCenterModal } from './TaskCenterModal';
 
 // Global utility to fetch league details
 export function getLeague(gqh: number) {
@@ -87,6 +90,7 @@ export default function HomeTab({
   user,
   onSwap,
   onOpenWalletModal,
+  onPayCustomTask,
   tonPrice,
   onUpdateTqhBalance,
   onUpdatePreferences,
@@ -100,6 +104,9 @@ export default function HomeTab({
   // Input conversion States
   const [gqhInput, setTqhInput] = useState('');
   const [swapError, setSwapError] = useState('');
+
+  // Add task overlay
+  const [showTaskCenterModal, setShowTaskCenterModal] = useState(false);
 
   // League details overlay bottom drawer
   const [showLeagueDrawer, setShowLeagueDrawer] = useState(false);
@@ -341,16 +348,21 @@ export default function HomeTab({
 
       {/* 1. Header Profile & League badge section */}
       <div 
-        className="relative flex items-center justify-between bg-[#1c1c1e]/60 border border-slate-800 p-3 rounded-2xl shadow-sm overflow-hidden"
+        className="relative flex items-center justify-between bg-slate-900/50 border border-slate-700/50 p-3.5 rounded-2xl shadow-lg overflow-hidden"
       >
         {/* Background Image Layer */}
-        {PROFILE_BACKGROUNDS[profileBgIndex] && (
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 z-0"
-            style={{ backgroundImage: `url(${PROFILE_BACKGROUNDS[profileBgIndex]})` }}
-          />
+        {PROFILE_BACKGROUNDS[profileBgIndex] ? (
+          <>
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
+              style={{ backgroundImage: `url(${PROFILE_BACKGROUNDS[profileBgIndex]})` }}
+            />
+            {/* Dark gradient on the left to keep text readable */}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/50 to-slate-950/20 z-0 pointer-events-none" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-950 z-0 pointer-events-none" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1c1c1e] via-[#1c1c1e]/90 to-transparent z-0" />
 
         <div className="flex items-center gap-2.5 relative z-10">
           <div className="relative">
@@ -392,6 +404,15 @@ export default function HomeTab({
           </button>
         </div>
       </div>
+
+      {/* Task Creation Button */}
+      <button 
+        onClick={() => setShowTaskCenterModal(true)}
+        className="w-full bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm py-3 rounded-2xl border border-blue-500/30 shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
+      >
+        <Target className="w-4 h-4" />
+        Add Task
+      </button>
 
       {/* 2. Total estimated balance card */}
       <div className="relative overflow-hidden bg-gradient-to-br from-[#0c1233]/70 via-[#070b1e]/60 to-[#0e163b]/50 border border-slate-800 backdrop-blur-xl rounded-2xl p-4 text-center space-y-1.5 shadow-sm select-none">
@@ -1051,6 +1072,20 @@ export default function HomeTab({
           {t('airdrop_check_btn', 'Airdrop Check')}
         </button>
       </div>
+
+      {/* ======================================= */}
+      {/*              TASK CENTER MODAL            */}
+      {/* ======================================= */}
+      <AnimatePresence>
+        {showTaskCenterModal && (
+          <TaskCenterModal 
+            onClose={() => setShowTaskCenterModal(false)}
+            onShowToast={onShowToast || (() => {})}
+            onOpenWalletModal={onOpenWalletModal}
+            onPayCustomTask={onPayCustomTask || (async () => {})}
+          />
+        )}
+      </AnimatePresence>
 
       {/* ======================================= */}
       {/*   REPLICATED LEAGUE & LEADERBOARD SHEET   */}

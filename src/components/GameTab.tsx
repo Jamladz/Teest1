@@ -15,6 +15,7 @@ export default function GameTab({ user, onLaunchGame }: GameTabProps) {
   // Dynamic online users
   const [dbUsers, setDbUsers] = useState(148532);
   const [crUsers, setCrUsers] = useState(87421);
+  const [cmUsers, setCmUsers] = useState(105432);
 
   useEffect(() => {
     setDropBlastHighScore(parseInt(localStorage.getItem('drop_blast_highscore') || '0', 10));
@@ -23,10 +24,14 @@ export default function GameTab({ user, onLaunchGame }: GameTabProps) {
     // Initial random value between 35k and 200k
     setDbUsers(Math.floor(Math.random() * (200000 - 35000 + 1) + 35000));
     setCrUsers(Math.floor(Math.random() * (150000 - 35000 + 1) + 35000)); // slightly less maybe
+    
+    // Tokens Matcher requires 100k to 200k specifically based on instructions
+    setCmUsers(Math.floor(Math.random() * (200000 - 100000 + 1) + 100000));
 
     const interval = setInterval(() => {
       setDbUsers(prev => Math.max(35000, Math.min(200000, prev + Math.floor(Math.random() * 201) - 80)));
       setCrUsers(prev => Math.max(35000, Math.min(200000, prev + Math.floor(Math.random() * 151) - 60)));
+      setCmUsers(prev => Math.max(100000, Math.min(200000, prev + Math.floor(Math.random() * 301) - 130)));
     }, 4000);
 
     return () => clearInterval(interval);
@@ -166,7 +171,7 @@ export default function GameTab({ user, onLaunchGame }: GameTabProps) {
             <div className="grid grid-cols-2 gap-2 text-[10px] bg-purple-950/40 p-2.5 rounded-xl border border-purple-500/15">
               <div className="flex items-center gap-1.5 text-slate-400">
                 <Users className="w-3.5 h-3.5 text-purple-500/80" />
-                <span>Active: <strong className="text-slate-200">12,431</strong></span>
+                <span>Active: <strong className="text-slate-200">{cmUsers.toLocaleString()}</strong></span>
               </div>
               <div className="flex items-center gap-1.5 text-slate-450">
                 <Trophy className="w-3.5 h-3.5 text-yellow-400" />
