@@ -3,6 +3,8 @@ import { auth, db } from '../lib/firebase';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { UserState, ActivityLog } from '../types';
 
+import { signInAnonymously } from 'firebase/auth';
+
 // Initial states fallback logic
 const getInitialUser = (): UserState => {
   let username = 'Telegram User';
@@ -70,6 +72,10 @@ export function useFirebaseSync() {
 
   // Track Auth state
   useEffect(() => {
+    signInAnonymously(auth).catch((error) => {
+      console.error("Anonymous auth failed:", error);
+    });
+
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
         setUserId(firebaseUser.uid);
