@@ -1,6 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Volume2, VolumeX, TrendingUp, Play, RotateCcw, X, Trophy } from 'lucide-react';
-import { UserState } from '../types';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Volume2,
+  VolumeX,
+  TrendingUp,
+  Play,
+  RotateCcw,
+  X,
+  Trophy,
+} from "lucide-react";
+import { UserState } from "../types";
 
 interface CryptoRunnerGameProps {
   user: UserState;
@@ -12,7 +20,7 @@ interface Obstacle {
   x: number;
   width: number;
   height: number;
-  type: 'red_candle' | 'barricade';
+  type: "red_candle" | "barricade";
 }
 
 interface MarketCoin {
@@ -22,7 +30,11 @@ interface MarketCoin {
   collected: boolean;
 }
 
-export default function CryptoRunnerGame({ user, onFinishGame, onClose }: CryptoRunnerGameProps) {
+export default function CryptoRunnerGame({
+  user,
+  onFinishGame,
+  onClose,
+}: CryptoRunnerGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -33,7 +45,7 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(() => {
-    return parseInt(localStorage.getItem('crypto_runner_highscore') || '0', 10);
+    return parseInt(localStorage.getItem("crypto_runner_highscore") || "0", 10);
   });
 
   // Game physical environment stats
@@ -55,10 +67,12 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
     if (muted) return;
     try {
       if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        audioCtxRef.current = new (
+          window.AudioContext || (window as any).webkitAudioContext
+        )();
       }
       const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') ctx.resume();
+      if (ctx.state === "suspended") ctx.resume();
 
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -79,10 +93,12 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
     if (muted) return;
     try {
       if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        audioCtxRef.current = new (
+          window.AudioContext || (window as any).webkitAudioContext
+        )();
       }
       const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') ctx.resume();
+      if (ctx.state === "suspended") ctx.resume();
 
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -103,17 +119,19 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
     if (muted) return;
     try {
       if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        audioCtxRef.current = new (
+          window.AudioContext || (window as any).webkitAudioContext
+        )();
       }
       const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') ctx.resume();
+      if (ctx.state === "suspended") ctx.resume();
 
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
       gain.connect(ctx.destination);
 
-      osc.type = 'sawtooth';
+      osc.type = "sawtooth";
       osc.frequency.setValueAtTime(150, ctx.currentTime);
       osc.frequency.linearRampToValueAtTime(30, ctx.currentTime + 0.4);
       gain.gain.setValueAtTime(0.2, ctx.currentTime);
@@ -136,8 +154,8 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
 
   useEffect(() => {
     setupCanvas();
-    window.addEventListener('resize', setupCanvas);
-    return () => window.removeEventListener('resize', setupCanvas);
+    window.addEventListener("resize", setupCanvas);
+    return () => window.removeEventListener("resize", setupCanvas);
   }, []);
 
   const jump = () => {
@@ -174,7 +192,7 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
 
     setScore((finalVal) => {
       if (finalVal > highScore) {
-        localStorage.setItem('crypto_runner_highscore', finalVal.toString());
+        localStorage.setItem("crypto_runner_highscore", finalVal.toString());
         setHighScore(finalVal);
       }
       return finalVal;
@@ -184,7 +202,7 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
   useEffect(() => {
     if (!isPlaying) return;
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
+    const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
 
     let localFrameId: number;
@@ -192,11 +210,11 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
     const gravity = 0.5;
 
     const gameLoop = () => {
-      ctx.fillStyle = '#0f172a';
+      ctx.fillStyle = "#0f172a";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Floor line
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
       ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.moveTo(0, groundY);
@@ -204,18 +222,18 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
       ctx.stroke();
 
       // Draw stylized floor patterns
-      ctx.fillStyle = '#1e293b';
+      ctx.fillStyle = "#1e293b";
       ctx.fillRect(0, groundY + 2, canvas.width, canvas.height - groundY);
 
       // Obstacle & Coin spawning logic
       tickerRef.current++;
       if (tickerRef.current % 130 === 0) {
-        const types: Obstacle['type'][] = ['red_candle', 'barricade'];
+        const types: Obstacle["type"][] = ["red_candle", "barricade"];
         const chosenType = types[Math.floor(Math.random() * types.length)];
         obstaclesRef.current.push({
           x: canvas.width + 50,
-          width: chosenType === 'red_candle' ? 20 : 35,
-          height: chosenType === 'red_candle' ? 55 : 30,
+          width: chosenType === "red_candle" ? 20 : 35,
+          height: chosenType === "red_candle" ? 55 : 30,
           type: chosenType,
         });
 
@@ -252,24 +270,24 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
       // Golden outer layer
       ctx.beginPath();
       ctx.arc(0, 0, player.radius, 0, Math.PI * 2);
-      ctx.fillStyle = '#fbbf24';
-      ctx.shadowColor = '#fbbf24';
+      ctx.fillStyle = "#fbbf24";
+      ctx.shadowColor = "#fbbf24";
       ctx.shadowBlur = 12;
       ctx.fill();
 
       // Inner details
       ctx.beginPath();
       ctx.arc(0, 0, player.radius - 4, 0, Math.PI * 2);
-      ctx.fillStyle = '#d97706';
+      ctx.fillStyle = "#d97706";
       ctx.fill();
 
       // Coin currency symbol
       ctx.rotate(-player.rotation); // keep text vertical
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('₿', 0, 0);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 12px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("₿", 0, 0);
 
       ctx.restore();
       ctx.shadowBlur = 0; // reset
@@ -281,15 +299,15 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
         // Draw obstacle
         ctx.save();
         ctx.translate(obs.x, groundY - obs.height / 2);
-        if (obs.type === 'red_candle') {
+        if (obs.type === "red_candle") {
           // Downward trading chart candle
-          ctx.fillStyle = '#ef4444';
-          ctx.shadowColor = '#ef4444';
+          ctx.fillStyle = "#ef4444";
+          ctx.shadowColor = "#ef4444";
           ctx.shadowBlur = 8;
           ctx.fillRect(-obs.width / 2, -obs.height / 2, obs.width, obs.height);
 
           // Candle wicks
-          ctx.strokeStyle = '#ef4444';
+          ctx.strokeStyle = "#ef4444";
           ctx.lineWidth = 2.5;
           ctx.beginPath();
           ctx.moveTo(0, -obs.height / 2 - 10);
@@ -297,14 +315,19 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
           ctx.stroke();
         } else {
           // Market Barrier block
-          ctx.fillStyle = '#64748b';
-          ctx.strokeStyle = '#475569';
+          ctx.fillStyle = "#64748b";
+          ctx.strokeStyle = "#475569";
           ctx.lineWidth = 2;
           ctx.fillRect(-obs.width / 2, -obs.height / 2, obs.width, obs.height);
-          ctx.strokeRect(-obs.width / 2, -obs.height / 2, obs.width, obs.height);
+          ctx.strokeRect(
+            -obs.width / 2,
+            -obs.height / 2,
+            obs.width,
+            obs.height,
+          );
 
           // Danger stripes
-          ctx.strokeStyle = '#fbbf24';
+          ctx.strokeStyle = "#fbbf24";
           ctx.lineWidth = 3;
           ctx.beginPath();
           ctx.moveTo(-10, -10);
@@ -343,16 +366,16 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
           // Draw coin
           ctx.beginPath();
           ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
-          ctx.fillStyle = '#10b981';
-          ctx.shadowColor = '#10b981';
+          ctx.fillStyle = "#10b981";
+          ctx.shadowColor = "#10b981";
           ctx.shadowBlur = 8;
           ctx.fill();
 
-          ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 9px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText('$', c.x, c.y);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "bold 9px sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("$", c.x, c.y);
           ctx.shadowBlur = 0;
 
           // Check hit
@@ -382,7 +405,20 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
   const earnedTqh = Math.floor(score / 350);
 
   const confirmFinish = () => {
-    onFinishGame(score, earnedTqh);
+    if (earnedTqh > 0 && (window as any).Adsgram) {
+      const AdController = (window as any).Adsgram.init({
+        blockId: "int-36011",
+      });
+      AdController.show()
+        .then(() => {
+          onFinishGame(score, earnedTqh);
+        })
+        .catch(() => {
+          onFinishGame(score, earnedTqh);
+        });
+    } else {
+      onFinishGame(score, earnedTqh);
+    }
   };
 
   return (
@@ -395,7 +431,9 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
           <div className="bg-slate-900/80 border border-slate-700/50 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-2">
             <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse" />
             <span className="text-xs text-slate-400">Score:</span>
-            <span className="font-bold text-emerald-400 text-sm md:text-base">{score}</span>
+            <span className="font-bold text-emerald-400 text-sm md:text-base">
+              {score}
+            </span>
           </div>
         </div>
 
@@ -404,7 +442,11 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
             onClick={() => setMuted(!muted)}
             className="p-2 rounded-xl bg-slate-900/80 border border-slate-700/50 text-slate-300 hover:text-white"
           >
-            {muted ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-emerald-400" />}
+            {muted ? (
+              <VolumeX className="w-5 h-5 text-red-400" />
+            ) : (
+              <Volume2 className="w-5 h-5 text-emerald-400" />
+            )}
           </button>
           <button
             onClick={onClose}
@@ -443,20 +485,29 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
                 CRYPTO RUNNER
               </h2>
               <p className="text-sm text-slate-400 mt-2 max-w-sm">
-                Jump over red charts and hazard structures! Collect dollar coins to boost your point multiplier.
+                Jump over red charts and hazard structures! Collect dollar coins
+                to boost your point multiplier.
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 w-full">
               <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl flex flex-col items-center">
                 <Trophy className="w-5 h-5 text-yellow-400 mb-1" />
-                <span className="text-xs text-slate-400 uppercase">High Score</span>
-                <span className="text-lg font-bold text-white mt-1">{highScore}</span>
+                <span className="text-xs text-slate-400 uppercase">
+                  High Score
+                </span>
+                <span className="text-lg font-bold text-white mt-1">
+                  {highScore}
+                </span>
               </div>
               <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl flex flex-col items-center">
                 <TrendingUp className="w-5 h-5 text-emerald-400 mb-1" />
-                <span className="text-xs text-slate-400 uppercase">Yield Status</span>
-                <span className="text-lg font-bold text-emerald-400 mt-1">High Volatility</span>
+                <span className="text-xs text-slate-400 uppercase">
+                  Yield Status
+                </span>
+                <span className="text-lg font-bold text-emerald-400 mt-1">
+                  High Volatility
+                </span>
               </div>
             </div>
 
@@ -468,7 +519,10 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
               Launch Runner
             </button>
 
-            <button onClick={onClose} className="text-slate-400 text-sm hover:text-white">
+            <button
+              onClick={onClose}
+              className="text-slate-400 text-sm hover:text-white"
+            >
               Return to Platform
             </button>
           </div>
@@ -479,8 +533,12 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
       {gameOver && (
         <div className="absolute inset-0 bg-[#0f172a]/97 flex flex-col items-center justify-center p-6 text-center z-[2005]">
           <div className="max-w-sm w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl flex flex-col items-center gap-6">
-            <h2 className="text-2xl font-black text-rose-500 tracking-wider">MARKET CRASH</h2>
-            <p className="text-slate-400 text-sm -mt-3">You hit an obstacle chart candle!</p>
+            <h2 className="text-2xl font-black text-rose-500 tracking-wider">
+              MARKET CRASH
+            </h2>
+            <p className="text-slate-400 text-sm -mt-3">
+              You hit an obstacle chart candle!
+            </p>
 
             <div className="w-full space-y-3">
               <div className="bg-slate-800/40 p-4 rounded-2xl flex justify-between items-center">
@@ -489,8 +547,12 @@ export default function CryptoRunnerGame({ user, onFinishGame, onClose }: Crypto
               </div>
 
               <div className="bg-emerald-900/20 border border-emerald-800/40 p-4 rounded-2xl flex justify-between items-center">
-                <span className="text-sm text-emerald-400 font-semibold">Earned Yield:</span>
-                <span className="text-lg font-bold text-emerald-400">+{earnedTqh} GQH</span>
+                <span className="text-sm text-emerald-400 font-semibold">
+                  Earned Yield:
+                </span>
+                <span className="text-lg font-bold text-emerald-400">
+                  +{earnedTqh} GQH
+                </span>
               </div>
             </div>
 

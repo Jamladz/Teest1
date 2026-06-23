@@ -1,6 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Volume2, VolumeX, Shield, Play, RotateCcw, X, Trophy } from 'lucide-react';
-import { UserState } from '../types';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Volume2,
+  VolumeX,
+  Shield,
+  Play,
+  RotateCcw,
+  X,
+  Trophy,
+} from "lucide-react";
+import { UserState } from "../types";
 
 interface DropBlastGameProps {
   user: UserState;
@@ -11,7 +19,7 @@ interface DropBlastGameProps {
 interface GameObject {
   x: number;
   y: number;
-  type: 'coin' | 'freeze' | 'bomb' | 'star';
+  type: "coin" | "freeze" | "bomb" | "star";
   size: number;
   speed: number;
   angle: number;
@@ -29,7 +37,11 @@ interface Particle {
   maxLife: number;
 }
 
-export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlastGameProps) {
+export default function DropBlastGame({
+  user,
+  onFinishGame,
+  onClose,
+}: DropBlastGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -43,7 +55,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(45);
   const [highScore, setHighScore] = useState(() => {
-    return parseInt(localStorage.getItem('drop_blast_highscore') || '0', 10);
+    return parseInt(localStorage.getItem("drop_blast_highscore") || "0", 10);
   });
 
   // Game Engine logic references
@@ -65,15 +77,15 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
   useEffect(() => {
     // Preload custom requested images
     const coinImg = new Image();
-    coinImg.src = 'https://i.suar.me/2zOKw/l';
+    coinImg.src = "https://i.suar.me/2zOKw/l";
     coinImgRef.current = coinImg;
 
     const timeImg = new Image();
-    timeImg.src = 'https://i.suar.me/a9xWd/l';
+    timeImg.src = "https://i.suar.me/a9xWd/l";
     timeImgRef.current = timeImg;
 
     const frogImg = new Image();
-    frogImg.src = 'https://i.suar.me/1zNmX/l';
+    frogImg.src = "https://i.suar.me/1zNmX/l";
     frogImgRef.current = frogImg;
   }, []);
 
@@ -82,14 +94,18 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sound Synth Synthesizer
-  const playSoundSynth = (type: 'coin' | 'freeze' | 'bomb' | 'star' | 'start' | 'gameover') => {
+  const playSoundSynth = (
+    type: "coin" | "freeze" | "bomb" | "star" | "start" | "gameover",
+  ) => {
     if (muted) return;
     try {
       if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        audioCtxRef.current = new (
+          window.AudioContext || (window as any).webkitAudioContext
+        )();
       }
       const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') {
+      if (ctx.state === "suspended") {
         ctx.resume();
       }
 
@@ -98,40 +114,43 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
       osc.connect(gain);
       gain.connect(ctx.destination);
 
-      if (type === 'coin') {
+      if (type === "coin") {
         osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
         osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1); // A5
         gain.gain.setValueAtTime(0.1, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
         osc.start();
         osc.stop(ctx.currentTime + 0.16);
-      } else if (type === 'star') {
-        osc.type = 'triangle';
+      } else if (type === "star") {
+        osc.type = "triangle";
         osc.frequency.setValueAtTime(440, ctx.currentTime);
         osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.05);
-        osc.frequency.exponentialRampToValueAtTime(1318.51, ctx.currentTime + 0.15);
+        osc.frequency.exponentialRampToValueAtTime(
+          1318.51,
+          ctx.currentTime + 0.15,
+        );
         gain.gain.setValueAtTime(0.12, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
         osc.start();
         osc.stop(ctx.currentTime + 0.26);
-      } else if (type === 'freeze') {
-        osc.type = 'sine';
+      } else if (type === "freeze") {
+        osc.type = "sine";
         osc.frequency.setValueAtTime(800, ctx.currentTime);
         osc.frequency.linearRampToValueAtTime(200, ctx.currentTime + 0.35);
         gain.gain.setValueAtTime(0.15, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
         osc.start();
         osc.stop(ctx.currentTime + 0.41);
-      } else if (type === 'bomb') {
-        osc.type = 'sawtooth';
+      } else if (type === "bomb") {
+        osc.type = "sawtooth";
         osc.frequency.setValueAtTime(120, ctx.currentTime);
         osc.frequency.linearRampToValueAtTime(40, ctx.currentTime + 0.5);
         gain.gain.setValueAtTime(0.25, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
         osc.start();
         osc.stop(ctx.currentTime + 0.61);
-      } else if (type === 'start') {
-        osc.type = 'sine';
+      } else if (type === "start") {
+        osc.type = "sine";
         osc.frequency.setValueAtTime(440, ctx.currentTime);
         osc.frequency.setValueAtTime(554.37, ctx.currentTime + 0.08);
         osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.16);
@@ -140,8 +159,8 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
         osc.start();
         osc.stop(ctx.currentTime + 0.45);
-      } else if (type === 'gameover') {
-        osc.type = 'sawtooth';
+      } else if (type === "gameover") {
+        osc.type = "sawtooth";
         osc.frequency.setValueAtTime(220, ctx.currentTime);
         osc.frequency.linearRampToValueAtTime(110, ctx.currentTime + 0.5);
         gain.gain.setValueAtTime(0.15, ctx.currentTime);
@@ -150,7 +169,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
         osc.stop(ctx.currentTime + 0.6);
       }
     } catch (e) {
-      console.warn('Audio failed to synthesize', e);
+      console.warn("Audio failed to synthesize", e);
     }
   };
 
@@ -171,13 +190,18 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
 
   useEffect(() => {
     setupCanvasSize();
-    window.addEventListener('resize', setupCanvasSize);
+    window.addEventListener("resize", setupCanvasSize);
     return () => {
-      window.removeEventListener('resize', setupCanvasSize);
+      window.removeEventListener("resize", setupCanvasSize);
     };
   }, []);
 
-  const triggerParticles = (x: number, y: number, color: string, count = 12) => {
+  const triggerParticles = (
+    x: number,
+    y: number,
+    color: string,
+    count = 12,
+  ) => {
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = Math.random() * 5 + 2;
@@ -210,7 +234,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
       playerRef.current.targetX = canvas.width / 2;
     }
 
-    playSoundSynth('start');
+    playSoundSynth("start");
 
     // Timer Interval
     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
@@ -229,7 +253,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
   const endGame = () => {
     setIsPlaying(false);
     setGameOver(true);
-    playSoundSynth('gameover');
+    playSoundSynth("gameover");
 
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
@@ -239,7 +263,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
     // Save high score
     setScore((finalScore) => {
       if (finalScore > highScore) {
-        localStorage.setItem('drop_blast_highscore', finalScore.toString());
+        localStorage.setItem("drop_blast_highscore", finalScore.toString());
         setHighScore(finalScore);
       }
       return finalScore;
@@ -251,18 +275,18 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
     if (!isPlaying) return;
 
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
+    const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
 
     let frameId: number;
 
     const loop = () => {
       // 1. Clear background
-      ctx.fillStyle = '#0f172a';
+      ctx.fillStyle = "#0f172a";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Simple grid pattern
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.02)";
       ctx.lineWidth = 1;
       const gridSize = 40;
       for (let x = 0; x < canvas.width; x += gridSize) {
@@ -284,7 +308,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
         if (freezeTimerRef.current <= 0) {
           freezeActiveRef.current = false;
         }
-        ctx.fillStyle = 'rgba(30, 144, 255, 0.08)';
+        ctx.fillStyle = "rgba(30, 144, 255, 0.08)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
@@ -294,21 +318,31 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
         if (bombTimerRef.current <= 0) {
           bombActiveRef.current = false;
         }
-        ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+        ctx.fillStyle = "rgba(239, 68, 68, 0.15)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
       // 2. Spawn logic
       const spawnChance = freezeActiveRef.current ? 0.012 : 0.035;
       if (Math.random() < spawnChance && objectsRef.current.length < 15) {
-        const types: GameObject['type'][] = ['coin', 'coin', 'coin', 'coin', 'coin', 'star', 'freeze', 'bomb', 'bomb'];
+        const types: GameObject["type"][] = [
+          "coin",
+          "coin",
+          "coin",
+          "coin",
+          "coin",
+          "star",
+          "freeze",
+          "bomb",
+          "bomb",
+        ];
         const randomType = types[Math.floor(Math.random() * types.length)];
         objectsRef.current.push({
           x: Math.random() * (canvas.width - 40) + 20,
           y: -30,
           type: randomType,
-          size: randomType === 'star' ? 18 : randomType === 'bomb' ? 22 : 16,
-          speed: (Math.random() * 3 + 3) * (randomType === 'star' ? 1.4 : 1),
+          size: randomType === "star" ? 18 : randomType === "bomb" ? 22 : 16,
+          speed: (Math.random() * 3 + 3) * (randomType === "star" ? 1.4 : 1),
           angle: Math.random() * Math.PI,
           spinSpeed: (Math.random() - 0.5) * 0.1,
         });
@@ -319,11 +353,17 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
       let targetX = playerRef.current.targetX;
 
       if (isMovingLeft.current) {
-        targetX = Math.max(playerRef.current.size / 2, playerRef.current.x - playerSpeed);
+        targetX = Math.max(
+          playerRef.current.size / 2,
+          playerRef.current.x - playerSpeed,
+        );
         playerRef.current.targetX = targetX;
       }
       if (isMovingRight.current) {
-        targetX = Math.min(canvas.width - playerRef.current.size / 2, playerRef.current.x + playerSpeed);
+        targetX = Math.min(
+          canvas.width - playerRef.current.size / 2,
+          playerRef.current.x + playerSpeed,
+        );
         playerRef.current.targetX = targetX;
       }
 
@@ -341,7 +381,13 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
         ctx.shadowColor = p.color;
         ctx.shadowBlur = 8;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, Math.max(0, p.size * (1 - p.life / p.maxLife)), 0, Math.PI * 2);
+        ctx.arc(
+          p.x,
+          p.y,
+          Math.max(0, p.size * (1 - p.life / p.maxLife)),
+          0,
+          Math.PI * 2,
+        );
         ctx.fill();
         ctx.shadowBlur = 0; // reset shadow
 
@@ -351,7 +397,9 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
       // 5. Update and Draw Game Objects
       objectsRef.current = objectsRef.current.filter((obj) => {
         // Adjust speed based on freeze state
-        const actualSpeed = freezeActiveRef.current ? obj.speed * 0.4 : obj.speed;
+        const actualSpeed = freezeActiveRef.current
+          ? obj.speed * 0.4
+          : obj.speed;
         obj.y += actualSpeed;
         obj.angle += obj.spinSpeed;
 
@@ -360,21 +408,27 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
         ctx.translate(obj.x, obj.y);
         ctx.rotate(obj.angle);
 
-        ctx.shadowColor = 'transparent';
+        ctx.shadowColor = "transparent";
         ctx.shadowBlur = 0;
 
-        if (obj.type === 'coin') {
+        if (obj.type === "coin") {
           if (coinImgRef.current && coinImgRef.current.complete) {
             ctx.rotate(-obj.angle);
-            ctx.drawImage(coinImgRef.current, -obj.size * 1.5, -obj.size * 1.5, obj.size * 3, obj.size * 3);
+            ctx.drawImage(
+              coinImgRef.current,
+              -obj.size * 1.5,
+              -obj.size * 1.5,
+              obj.size * 3,
+              obj.size * 3,
+            );
           } else {
             // Fallback
             ctx.beginPath();
             ctx.arc(0, 0, obj.size, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffe066';
+            ctx.fillStyle = "#ffe066";
             ctx.fill();
           }
-        } else if (obj.type === 'star') {
+        } else if (obj.type === "star") {
           // Sparkling Diamond/Star
           ctx.beginPath();
           ctx.moveTo(0, -obj.size);
@@ -382,45 +436,51 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
           ctx.lineTo(0, obj.size);
           ctx.lineTo(-obj.size, 0);
           ctx.closePath();
-          ctx.fillStyle = '#c7d2fe';
-          ctx.shadowColor = '#6366f1';
+          ctx.fillStyle = "#c7d2fe";
+          ctx.shadowColor = "#6366f1";
           ctx.shadowBlur = 15;
           ctx.fill();
 
           ctx.rotate(-obj.angle);
-          ctx.fillStyle = '#4f46e5';
-          ctx.font = 'bold 11px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText('★', 0, 0);
-        } else if (obj.type === 'freeze') {
+          ctx.fillStyle = "#4f46e5";
+          ctx.font = "bold 11px sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("★", 0, 0);
+        } else if (obj.type === "freeze") {
           if (timeImgRef.current && timeImgRef.current.complete) {
             ctx.rotate(-obj.angle);
-            ctx.drawImage(timeImgRef.current, -obj.size * 1.5, -obj.size * 1.5, obj.size * 3, obj.size * 3);
+            ctx.drawImage(
+              timeImgRef.current,
+              -obj.size * 1.5,
+              -obj.size * 1.5,
+              obj.size * 3,
+              obj.size * 3,
+            );
           } else {
             // Freeze Snowflake Icebox
-            ctx.fillStyle = '#38bdf8';
-            ctx.shadowColor = '#0ea5e9';
+            ctx.fillStyle = "#38bdf8";
+            ctx.shadowColor = "#0ea5e9";
             ctx.shadowBlur = 12;
             ctx.beginPath();
             ctx.arc(0, 0, obj.size, 0, Math.PI * 2);
             ctx.fill();
-  
+
             // Blue center icon
-            ctx.fillStyle = '#0284c7';
+            ctx.fillStyle = "#0284c7";
             ctx.beginPath();
             ctx.moveTo(0, -6);
             ctx.lineTo(0, 6);
             ctx.moveTo(-6, 0);
             ctx.lineTo(6, 0);
-            ctx.strokeStyle = '#fff';
+            ctx.strokeStyle = "#fff";
             ctx.lineWidth = 2;
             ctx.stroke();
           }
-        } else if (obj.type === 'bomb') {
+        } else if (obj.type === "bomb") {
           // Hazard Spike/Bomb
-          ctx.fillStyle = '#ef4444';
-          ctx.shadowColor = '#b91c1c';
+          ctx.fillStyle = "#ef4444";
+          ctx.shadowColor = "#b91c1c";
           ctx.shadowBlur = 12;
           ctx.beginPath();
           ctx.arc(0, 0, obj.size - 4, 0, Math.PI * 2);
@@ -430,12 +490,12 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
           ctx.beginPath();
           ctx.moveTo(0, -obj.size + 4);
           ctx.quadraticCurveTo(8, -obj.size - 4, 12, -obj.size + 2);
-          ctx.strokeStyle = '#94a3b8';
+          ctx.strokeStyle = "#94a3b8";
           ctx.lineWidth = 2.5;
           ctx.stroke();
 
           // Spark
-          ctx.fillStyle = '#fbbf24';
+          ctx.fillStyle = "#fbbf24";
           ctx.beginPath();
           ctx.arc(12, -obj.size + 2, 3, 0, Math.PI * 2);
           ctx.fill();
@@ -450,23 +510,23 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
 
         if (distY < 20 && distX < playerRef.current.size / 2 + obj.size) {
           // Collided with player!
-          if (obj.type === 'coin') {
+          if (obj.type === "coin") {
             setScore((prev) => prev + 100);
-            triggerParticles(obj.x, obj.y, '#f59e0b');
-            playSoundSynth('coin');
-          } else if (obj.type === 'star') {
+            triggerParticles(obj.x, obj.y, "#f59e0b");
+            playSoundSynth("coin");
+          } else if (obj.type === "star") {
             setScore((prev) => prev + 250);
-            triggerParticles(obj.x, obj.y, '#818cf8', 18);
-            playSoundSynth('star');
-          } else if (obj.type === 'freeze') {
+            triggerParticles(obj.x, obj.y, "#818cf8", 18);
+            playSoundSynth("star");
+          } else if (obj.type === "freeze") {
             freezeActiveRef.current = true;
             freezeTimerRef.current = 6; // 6 seconds freeze
-            triggerParticles(obj.x, obj.y, '#38bdf8', 16);
-            playSoundSynth('freeze');
-          } else if (obj.type === 'bomb') {
+            triggerParticles(obj.x, obj.y, "#38bdf8", 16);
+            playSoundSynth("freeze");
+          } else if (obj.type === "bomb") {
             bombActiveRef.current = true;
             bombTimerRef.current = 0.4;
-            playSoundSynth('bomb');
+            playSoundSynth("bomb");
             // End the game instantly or minus plenty points
             setScore((prev) => Math.max(0, prev - 300));
             endGame();
@@ -484,15 +544,36 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
       const playerWidth = playerRef.current.size;
 
       if (frogImgRef.current && frogImgRef.current.complete) {
-        ctx.shadowColor = freezeActiveRef.current ? '#38bdf8' : 'transparent';
+        ctx.shadowColor = freezeActiveRef.current ? "#38bdf8" : "transparent";
         ctx.shadowBlur = freezeActiveRef.current ? 20 : 0;
-        ctx.drawImage(frogImgRef.current, playerX - playerWidth / 2, playerY - playerWidth / 2 - 10, playerWidth, playerWidth);
+        ctx.drawImage(
+          frogImgRef.current,
+          playerX - playerWidth / 2,
+          playerY - playerWidth / 2 - 10,
+          playerWidth,
+          playerWidth,
+        );
         ctx.shadowBlur = 0;
       } else {
         // Fallback Inner glow
-        const basketGradient = ctx.createLinearGradient(playerX, playerY, playerX, playerY + playerWidth);
-        basketGradient.addColorStop(0, freezeActiveRef.current ? 'rgba(56, 189, 248, 0.4)' : 'rgba(0, 120, 255, 0.4)');
-        basketGradient.addColorStop(1, freezeActiveRef.current ? 'rgba(56, 189, 248, 0.1)' : 'rgba(0, 120, 255, 0.1)');
+        const basketGradient = ctx.createLinearGradient(
+          playerX,
+          playerY,
+          playerX,
+          playerY + playerWidth,
+        );
+        basketGradient.addColorStop(
+          0,
+          freezeActiveRef.current
+            ? "rgba(56, 189, 248, 0.4)"
+            : "rgba(0, 120, 255, 0.4)",
+        );
+        basketGradient.addColorStop(
+          1,
+          freezeActiveRef.current
+            ? "rgba(56, 189, 248, 0.1)"
+            : "rgba(0, 120, 255, 0.1)",
+        );
 
         ctx.fillStyle = basketGradient;
         ctx.beginPath();
@@ -500,9 +581,11 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
         ctx.fill();
 
         // Outer glow of the shield
-        ctx.shadowColor = freezeActiveRef.current ? '#38bdf8' : '#0078ff';
+        ctx.shadowColor = freezeActiveRef.current ? "#38bdf8" : "#0078ff";
         ctx.shadowBlur = 20;
-        ctx.strokeStyle = freezeActiveRef.current ? 'rgba(186, 230, 253, 0.9)' : 'rgba(147, 197, 253, 0.9)';
+        ctx.strokeStyle = freezeActiveRef.current
+          ? "rgba(186, 230, 253, 0.9)"
+          : "rgba(147, 197, 253, 0.9)";
         ctx.lineWidth = 5;
 
         ctx.beginPath();
@@ -511,7 +594,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
 
         // Top bar of the shield
         ctx.lineWidth = 3;
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = "#ffffff";
         ctx.beginPath();
         ctx.moveTo(playerX - playerWidth / 2 - 5, playerY - 10);
         ctx.lineTo(playerX + playerWidth / 2 + 5, playerY - 10);
@@ -520,10 +603,14 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
         ctx.shadowBlur = 0; // reset
 
         // Draw standard GRAM or GQH logo decoration inside the basket
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        ctx.font = 'bold 11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(freezeActiveRef.current ? '❄️' : '🛡️', playerX, playerY + 5);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.font = "bold 11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          freezeActiveRef.current ? "❄️" : "🛡️",
+          playerX,
+          playerY + 5,
+        );
       }
 
       frameId = requestAnimationFrame(loop);
@@ -543,7 +630,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
       const x = e.clientX - rect.left;
       playerRef.current.targetX = Math.max(
         playerRef.current.size / 2,
-        Math.min(canvas.width - playerRef.current.size / 2, x)
+        Math.min(canvas.width - playerRef.current.size / 2, x),
       );
     }
   };
@@ -556,7 +643,7 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
       const x = e.clientX - rect.left;
       playerRef.current.targetX = Math.max(
         playerRef.current.size / 2,
-        Math.min(canvas.width - playerRef.current.size / 2, x)
+        Math.min(canvas.width - playerRef.current.size / 2, x),
       );
     }
   };
@@ -565,7 +652,20 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
   const rewardTqh = Math.floor(score / 100);
 
   const confirmFinish = () => {
-    onFinishGame(score, rewardTqh);
+    if (rewardTqh > 0 && (window as any).Adsgram) {
+      const AdController = (window as any).Adsgram.init({
+        blockId: "int-36010",
+      });
+      AdController.show()
+        .then(() => {
+          onFinishGame(score, rewardTqh);
+        })
+        .catch(() => {
+          onFinishGame(score, rewardTqh);
+        });
+    } else {
+      onFinishGame(score, rewardTqh);
+    }
   };
 
   return (
@@ -577,15 +677,31 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
       <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-auto z-[2001] px-2">
         <div className="flex gap-2">
           <div className="bg-slate-900/80 border border-slate-700/50 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-2">
-            <img src="https://i.suar.me/2zOKw/l" alt="Coin" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]" />
-            <span className="text-xs text-slate-400 hidden md:inline">Score:</span>
-            <span className="font-bold text-yellow-400 text-sm md:text-base">{score}</span>
+            <img
+              src="https://i.suar.me/2zOKw/l"
+              alt="Coin"
+              className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
+            />
+            <span className="text-xs text-slate-400 hidden md:inline">
+              Score:
+            </span>
+            <span className="font-bold text-yellow-400 text-sm md:text-base">
+              {score}
+            </span>
           </div>
 
           <div className="bg-slate-900/80 border border-slate-700/50 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-2">
-            <img src="https://i.suar.me/a9xWd/l" alt="Time" className="w-4 h-4 object-contain brightness-150 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]" />
-            <span className="text-xs text-slate-400 hidden md:inline">Time:</span>
-            <span className={`font-mono font-bold text-sm ${timeLeft <= 10 ? 'text-red-400 animate-pulse' : 'text-slate-200'}`}>
+            <img
+              src="https://i.suar.me/a9xWd/l"
+              alt="Time"
+              className="w-4 h-4 object-contain brightness-150 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]"
+            />
+            <span className="text-xs text-slate-400 hidden md:inline">
+              Time:
+            </span>
+            <span
+              className={`font-mono font-bold text-sm ${timeLeft <= 10 ? "text-red-400 animate-pulse" : "text-slate-200"}`}
+            >
               {timeLeft}s
             </span>
           </div>
@@ -597,7 +713,11 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
             aria-label="Toggle mute"
             className="p-2 rounded-xl bg-slate-900/80 border border-slate-700/50 text-slate-300 hover:text-white"
           >
-            {muted ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-emerald-400" />}
+            {muted ? (
+              <VolumeX className="w-5 h-5 text-red-400" />
+            ) : (
+              <Volume2 className="w-5 h-5 text-emerald-400" />
+            )}
           </button>
           <button
             onClick={onClose}
@@ -630,7 +750,8 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
                 BB DROP BLAST
               </h2>
               <p className="text-sm text-slate-400 mt-2 max-w-sm">
-                Catch gold coins & crystal stars using your frog character, collect freeze items to pause time, and don't catch bombs!
+                Catch gold coins & crystal stars using your frog character,
+                collect freeze items to pause time, and don't catch bombs!
               </p>
             </div>
 
@@ -638,13 +759,21 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
             <div className="grid grid-cols-2 gap-4 w-full">
               <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl flex flex-col items-center">
                 <Trophy className="w-5 h-5 text-yellow-400 mb-1" />
-                <span className="text-xs text-slate-400 uppercase">High Score</span>
-                <span className="text-lg font-bold text-white mt-1">{highScore}</span>
+                <span className="text-xs text-slate-400 uppercase">
+                  High Score
+                </span>
+                <span className="text-lg font-bold text-white mt-1">
+                  {highScore}
+                </span>
               </div>
               <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl flex flex-col items-center">
                 <Shield className="w-5 h-5 text-emerald-400 mb-1" />
-                <span className="text-xs text-slate-400 uppercase">Multiplier</span>
-                <span className="text-lg font-bold text-emerald-400 mt-1">1x GQH</span>
+                <span className="text-xs text-slate-400 uppercase">
+                  Multiplier
+                </span>
+                <span className="text-lg font-bold text-emerald-400 mt-1">
+                  1x GQH
+                </span>
               </div>
             </div>
 
@@ -690,8 +819,12 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
       {gameOver && (
         <div className="absolute inset-0 bg-[#0f172a]/97 flex flex-col items-center justify-center p-6 text-center z-[2005]">
           <div className="max-w-sm w-full bg-slate-900/90 border border-slate-800 p-8 rounded-3xl flex flex-col items-center gap-6 shadow-2xl">
-            <h2 className="text-2xl font-black text-rose-500 tracking-wider">GAME OVER</h2>
-            <p className="text-slate-400 text-sm -mt-3">You hit a bomb or ran out of time!</p>
+            <h2 className="text-2xl font-black text-rose-500 tracking-wider">
+              GAME OVER
+            </h2>
+            <p className="text-slate-400 text-sm -mt-3">
+              You hit a bomb or ran out of time!
+            </p>
 
             <div className="w-full space-y-3">
               <div className="bg-slate-800/40 p-4 rounded-2xl flex justify-between items-center">
@@ -700,8 +833,12 @@ export default function DropBlastGame({ user, onFinishGame, onClose }: DropBlast
               </div>
 
               <div className="bg-emerald-900/20 border border-emerald-800/40 p-4 rounded-2xl flex justify-between items-center">
-                <span className="text-sm text-emerald-400 font-semibold">Earned Rewards:</span>
-                <span className="text-lg font-bold text-emerald-400">+{rewardTqh} GQH</span>
+                <span className="text-sm text-emerald-400 font-semibold">
+                  Earned Rewards:
+                </span>
+                <span className="text-lg font-bold text-emerald-400">
+                  +{rewardTqh} GQH
+                </span>
               </div>
             </div>
 

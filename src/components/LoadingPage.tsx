@@ -1,8 +1,12 @@
-import { motion } from 'motion/react';
-import { Shield } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { motion } from "motion/react";
+import { Shield } from "lucide-react";
+import { useEffect, useState } from "react";
 
-export default function LoadingPage({ onComplete }: { onComplete: () => void }) {
+export default function LoadingPage({
+  onComplete,
+}: {
+  onComplete: () => void;
+}) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -41,14 +45,18 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
         <div className="relative p-6 bg-gradient-to-tr from-cyan-900/30 to-blue-900/30 rounded-3xl border border-cyan-500/20">
           <Shield className="w-16 h-16 text-cyan-400 animate-pulse" />
         </div>
-        <h1 className="text-2xl font-black text-white tracking-tighter">GramQash</h1>
+        <h1 className="text-2xl font-black text-white tracking-tighter">
+          GramQash
+        </h1>
         <div className="w-48 h-1.5 bg-blue-950 rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-cyan-500"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-xs text-slate-400 font-mono">Initializing ecosystem...</p>
+        <p className="text-xs text-slate-400 font-mono">
+          Initializing ecosystem...
+        </p>
       </motion.div>
     </motion.div>
   );

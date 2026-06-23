@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
-import { Copy, Check, Send, AlertTriangle, History, ArrowDownToLine, Users, Share2, Volume2, Sparkles, Pencil, X, CheckCircle2 } from 'lucide-react';
-import { UserState, ActivityLog, PROFILE_BACKGROUNDS } from '../types';
-import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState } from "react";
+import {
+  Copy,
+  Check,
+  Send,
+  AlertTriangle,
+  History,
+  ArrowDownToLine,
+  Users,
+  Share2,
+  Volume2,
+  Sparkles,
+  Pencil,
+  X,
+  CheckCircle2,
+} from "lucide-react";
+import { UserState, ActivityLog, PROFILE_BACKGROUNDS } from "../types";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "motion/react";
 
 interface ProfileTabProps {
   user: UserState;
@@ -13,26 +27,39 @@ interface ProfileTabProps {
   onClaimReferralBonus: () => void;
   profileBgIndex?: number;
   onUpdateProfileBg?: (index: number) => void;
-  onShowToast?: (message: string, type: 'success' | 'error' | 'info') => void;
+  onShowToast?: (message: string, type: "success" | "error" | "info") => void;
 }
 
-export default function ProfileTab({ 
-  user, 
-  onOpenWithdrawalModal, 
-  logs, 
-  tonPrice, 
-  onUpdatePreferences, 
+export default function ProfileTab({
+  user,
+  onOpenWithdrawalModal,
+  logs,
+  tonPrice,
+  onUpdatePreferences,
   onClaimReferralBonus,
   profileBgIndex = 0,
   onUpdateProfileBg,
-  onShowToast
+  onShowToast,
 }: ProfileTabProps) {
   const [copied, setCopied] = useState(false);
   const [showBgModal, setShowBgModal] = useState(false);
   const { t, i18n } = useTranslation();
 
   // Generate unique link
-  const refLink = `https://t.me/GramQashBot?start=ref_${user.username.toLowerCase().replace(/\s+/g, '_')}`;
+  const refLink = `https://t.me/TonQashBot/app?startapp=ref_${user.username.toLowerCase().replace(/\s+/g, "_")}`;
+
+  const handleShareTelegram = () => {
+    const text = encodeURIComponent("Join me on TonQash and earn real GRAM! Get +0.5 GRAM bonus:");
+    const url = encodeURIComponent(refLink);
+    const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
+    
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg?.openTelegramLink) {
+      tg.openTelegramLink(shareUrl);
+    } else {
+      window.open(shareUrl, "_blank");
+    }
+  };
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(refLink);
@@ -40,15 +67,17 @@ export default function ProfileTab({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const hasEnoughForWithdrawal = user.tonBalance >= 5.0;
+  const hasEnoughForWithdrawal = user.tonBalance >= 10.0;
 
-  const canClaimReferral = !user.dailyReferralClaimedAt || new Date().getTime() - new Date(user.dailyReferralClaimedAt).getTime() > 86400000;
-
+  const canClaimReferral =
+    !user.dailyReferralClaimedAt ||
+    new Date().getTime() - new Date(user.dailyReferralClaimedAt).getTime() >
+      86400000;
 
   const handleSelectBg = (index: number) => {
     if (onUpdateProfileBg) onUpdateProfileBg(index);
     setShowBgModal(false);
-    if (onShowToast) onShowToast('Background updated', 'success');
+    if (onShowToast) onShowToast("Background updated", "success");
   };
 
   return (
@@ -58,9 +87,11 @@ export default function ProfileTab({
         {/* Background Image Layer */}
         {PROFILE_BACKGROUNDS[profileBgIndex] ? (
           <>
-            <div 
+            <div
               className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-              style={{ backgroundImage: `url(${PROFILE_BACKGROUNDS[profileBgIndex]})` }}
+              style={{
+                backgroundImage: `url(${PROFILE_BACKGROUNDS[profileBgIndex]})`,
+              }}
             />
             {/* Carefully measured overlay: dark at bottom for text, lighter at top/middle to show image clearly */}
             <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/60 to-slate-950/95 z-0 pointer-events-none" />
@@ -83,14 +114,19 @@ export default function ProfileTab({
 
         <div className="space-y-0.5 relative z-10 flex items-center gap-2">
           <div className="text-center">
-            <h3 className="font-extrabold text-base text-slate-100 drop-shadow-sm">{user.username}</h3>
+            <h3 className="font-extrabold text-base text-slate-100 drop-shadow-sm">
+              {user.username}
+            </h3>
             <p className="text-[10px] text-slate-500 font-mono tracking-wide">
               {user.walletAddress ? (
                 <span className="text-blue-500 font-bold">
-                  {user.walletAddress.slice(0, 6)}...{user.walletAddress.slice(-4)}
+                  {user.walletAddress.slice(0, 6)}...
+                  {user.walletAddress.slice(-4)}
                 </span>
               ) : (
-                <span className="text-slate-500 font-semibold italic">Wallet disconnected</span>
+                <span className="text-slate-500 font-semibold italic">
+                  Wallet disconnected
+                </span>
               )}
             </p>
           </div>
@@ -107,15 +143,27 @@ export default function ProfileTab({
       {/* 2. Micro Stats Block Row */}
       <div className="grid grid-cols-2 gap-3.5">
         <div className="bg-[#0c1233]/70 border border-slate-800 p-3 rounded-xl text-center space-y-0.5 shadow">
-          <p className="text-[9px] text-blue-300 font-bold uppercase tracking-wider">Ton Balance</p>
-          <p className="text-lg font-black text-slate-100">{user.tonBalance.toFixed(3)}</p>
-          <p className="text-[10px] text-slate-500 font-semibold">~${(user.tonBalance * tonPrice).toFixed(1)}</p>
+          <p className="text-[9px] text-blue-300 font-bold uppercase tracking-wider">
+            Ton Balance
+          </p>
+          <p className="text-lg font-black text-slate-100">
+            {user.tonBalance.toFixed(3)}
+          </p>
+          <p className="text-[10px] text-slate-500 font-semibold">
+            ~${(user.tonBalance * tonPrice).toFixed(1)}
+          </p>
         </div>
 
         <div className="bg-[#0e163b]/70 border border-indigo-500/15 p-3 rounded-xl text-center space-y-0.5 shadow">
-          <p className="text-[9px] text-indigo-400 font-bold uppercase tracking-wider">GQH Balance</p>
-          <p className="text-lg font-black text-indigo-400">{(user.gqhBalance).toFixed(1)}</p>
-          <p className="text-[10px] text-slate-500 font-semibold">~${(user.gqhBalance * 0.0001 * tonPrice).toFixed(1)}</p>
+          <p className="text-[9px] text-indigo-400 font-bold uppercase tracking-wider">
+            GQH Balance
+          </p>
+          <p className="text-lg font-black text-indigo-400">
+            {user.gqhBalance.toFixed(1)}
+          </p>
+          <p className="text-[10px] text-slate-500 font-semibold">
+            ~${(user.gqhBalance * 0.0001 * tonPrice).toFixed(1)}
+          </p>
         </div>
       </div>
 
@@ -127,23 +175,30 @@ export default function ProfileTab({
         </h4>
 
         <p className="text-[11px] text-slate-400 leading-normal">
-          Settle your earned Gramcoin (GRAM (ton)) directly to custody wallets. Instant blockchain processing.
+          Settle your earned Gramcoin (GRAM (ton)) directly to custody wallets.
+          Instant blockchain processing.
         </p>
 
         {/* Warning Badge */}
         <div className="bg-red-500/10 border border-red-500/15 px-3 py-2.5 rounded-xl flex items-start gap-2.5">
           <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
           <div>
-            <p className="text-[10px] font-extrabold text-red-300 leading-none">Withdrawal Limit</p>
+            <p className="text-[10px] font-extrabold text-red-300 leading-none">
+              Withdrawal Limit
+            </p>
             <p className="text-[10px] text-red-400 leading-normal mt-0.5">
-              Minimum allowed size is <strong className="font-extrabold text-slate-200">5 GRAM</strong> (~${(5 * tonPrice).toFixed(0)} USD).
+              Minimum allowed size is{" "}
+              <strong className="font-extrabold text-slate-200">10 GRAM</strong>{" "}
+              (~${(10 * tonPrice).toFixed(0)} USD).
             </p>
           </div>
         </div>
 
         {!user.walletAddress ? (
           <div className="bg-[#1a110a]/50 text-center py-2.5 rounded-xl border border-dashed border-amber-500/20">
-            <p className="text-[11px] text-amber-500 font-bold">Please connect wallet before continuing.</p>
+            <p className="text-[11px] text-amber-500 font-bold">
+              Please connect wallet before continuing.
+            </p>
           </div>
         ) : (
           <button
@@ -151,7 +206,9 @@ export default function ProfileTab({
             disabled={!hasEnoughForWithdrawal}
             className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black rounded-xl text-xs shadow disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 transition cursor-pointer"
           >
-            {hasEnoughForWithdrawal ? 'Withdraw GRAM Now' : `Need ${ (5 - user.tonBalance > 0 ? (5 - user.tonBalance) : 0).toFixed(2) } more GRAM (ton)`}
+            {hasEnoughForWithdrawal
+              ? "Withdraw GRAM Now"
+              : `Need ${(10 - user.tonBalance > 0 ? 10 - user.tonBalance : 0).toFixed(2)} more GRAM (ton)`}
           </button>
         )}
       </div>
@@ -164,7 +221,9 @@ export default function ProfileTab({
         </h4>
 
         <p className="text-[11px] text-slate-400 leading-normal">
-          Share invitations and grab <strong className="text-purple-400 font-bold">10%</strong> royalties on reward accomplishments your active invitees grab!
+          Share invitations and grab{" "}
+          <strong className="text-purple-400 font-bold">10%</strong> royalties
+          on reward accomplishments your active invitees grab!
         </p>
 
         <div className="py-1">
@@ -172,20 +231,25 @@ export default function ProfileTab({
             onClick={canClaimReferral ? onClaimReferralBonus : undefined}
             disabled={!canClaimReferral}
             className={`w-full py-3.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2
-              ${canClaimReferral 
-                ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-[0_0_15px_rgba(168,85,247,0.5)] animate-pulse hover:scale-[1.02] cursor-pointer' 
-                : 'bg-slate-900 text-slate-500 border border-slate-800 cursor-not-allowed'
+              ${
+                canClaimReferral
+                  ? "bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-[0_0_15px_rgba(168,85,247,0.5)] animate-pulse hover:scale-[1.02] cursor-pointer"
+                  : "bg-slate-900 text-slate-500 border border-slate-800 cursor-not-allowed"
               }
             `}
           >
             <Sparkles className="w-4 h-4" />
-            {canClaimReferral ? 'Claim Daily GQH Bonus (Up to 120 GQH)' : 'Bonus Claimed Today'}
+            {canClaimReferral
+              ? "Claim Daily GQH Bonus (Up to 120 GQH)"
+              : "Bonus Claimed Today"}
           </button>
         </div>
 
         {/* Input Copy Link */}
         <div className="space-y-1.5">
-          <p className="text-[9px] uppercase font-bold text-slate-450 px-0.5">Your Referral Link</p>
+          <p className="text-[9px] uppercase font-bold text-slate-450 px-0.5">
+            Your Referral Link
+          </p>
           <div className="flex gap-2">
             <div className="flex-1 bg-slate-950/60 border border-purple-500/15 px-3 py-2 rounded-xl text-[10px] text-purple-200 overflow-hidden text-ellipsis whitespace-nowrap self-center font-mono">
               {refLink}
@@ -196,9 +260,20 @@ export default function ProfileTab({
               className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:text-white hover:bg-purple-500/25 transition active:scale-95"
               aria-label="Copy Link"
             >
-              {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+              {copied ? (
+                <Check className="w-4 h-4 text-green-500" />
+              ) : (
+                <Copy className="w-4 h-4" />
+              )}
             </button>
           </div>
+          <button
+            onClick={handleShareTelegram}
+            className="w-full py-2.5 mt-2 bg-[#2AABEE]/10 hover:bg-[#2AABEE]/20 border border-[#2AABEE]/30 text-[#2AABEE] text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition"
+          >
+            <Send className="w-4 h-4" />
+            Share Referral Link on Telegram
+          </button>
           {copied && (
             <p className="text-[9px] text-green-500 font-bold text-center animate-pulse">
               ✓ Referral link copied! Share with friends.
@@ -211,47 +286,67 @@ export default function ProfileTab({
       <div className="bg-gradient-to-br from-[#0a0f28]/60 via-[#070b1e]/60 to-[#0a0f28]/60 border border-slate-800 p-4 rounded-2xl space-y-3.5 shadow-xl">
         <h4 className="font-extrabold text-sm text-slate-200 flex items-center gap-1.5 leading-none">
           <Sparkles className="w-4 h-4 text-blue-500 animate-pulse" />
-          {t('app_preferences')}
+          {t("app_preferences")}
         </h4>
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-slate-350 font-semibold">{t('language')}</span>
+            <span className="text-[11px] text-slate-350 font-semibold">
+              {t("language")}
+            </span>
             <select
               value={i18n.language}
               onChange={(e) => i18n.changeLanguage(e.target.value)}
               className="bg-slate-800 text-slate-200 text-[10px] p-1 rounded px-2"
             >
-              <option value="en">{t('english')}</option>
-              <option value="ar">{t('arabic')}</option>
-              <option value="ru">{t('russian')}</option>
+              <option value="en">{t("english")}</option>
+              <option value="ar">{t("arabic")}</option>
+              <option value="ru">{t("russian")}</option>
             </select>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Volume2 className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[11px] text-slate-350 font-semibold">Micro Pop SFX Synth</span>
+              <span className="text-[11px] text-slate-350 font-semibold">
+                Micro Pop SFX Synth
+              </span>
             </div>
             <button
-              onClick={() => onUpdatePreferences?.(user.hapticEnabled !== false, !(user.soundEnabled !== false))}
+              onClick={() =>
+                onUpdatePreferences?.(
+                  user.hapticEnabled !== false,
+                  !(user.soundEnabled !== false),
+                )
+              }
               className={`px-3 py-1 rounded-xl text-[10px] font-black transition cursor-pointer ${
-                user.soundEnabled !== false ? 'bg-blue-500/10 text-blue-400 border border-slate-800' : 'bg-slate-800 text-slate-550 border border-transparent'
+                user.soundEnabled !== false
+                  ? "bg-blue-500/10 text-blue-400 border border-slate-800"
+                  : "bg-slate-800 text-slate-550 border border-transparent"
               }`}
             >
-              {user.soundEnabled !== false ? 'ENABLED' : 'DISABLED'}
+              {user.soundEnabled !== false ? "ENABLED" : "DISABLED"}
             </button>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-xs text-slate-400">⚡</span>
-              <span className="text-[11px] text-slate-350 font-semibold">Simulated Tactile Haptic</span>
+              <span className="text-[11px] text-slate-350 font-semibold">
+                Simulated Tactile Haptic
+              </span>
             </div>
             <button
-              onClick={() => onUpdatePreferences?.(!(user.hapticEnabled !== false), user.soundEnabled !== false)}
+              onClick={() =>
+                onUpdatePreferences?.(
+                  !(user.hapticEnabled !== false),
+                  user.soundEnabled !== false,
+                )
+              }
               className={`px-3 py-1 rounded-xl text-[10px] font-black transition cursor-pointer ${
-                user.hapticEnabled !== false ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/10' : 'bg-slate-800 text-slate-550 border border-transparent'
+                user.hapticEnabled !== false
+                  ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/10"
+                  : "bg-slate-800 text-slate-550 border border-transparent"
               }`}
             >
-              {user.hapticEnabled !== false ? 'ENABLED' : 'DISABLED'}
+              {user.hapticEnabled !== false ? "ENABLED" : "DISABLED"}
             </button>
           </div>
         </div>
@@ -261,7 +356,9 @@ export default function ProfileTab({
       <div className="bg-[#0b0e24]/70 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
         <div className="border-b border-slate-800 px-4 py-2.5 flex items-center gap-1.5 bg-slate-800/20">
           <History className="w-3.5 h-3.5 text-blue-400" />
-          <span className="font-extrabold text-xs text-slate-300 uppercase tracking-wider">Recent Activity</span>
+          <span className="font-extrabold text-xs text-slate-300 uppercase tracking-wider">
+            Recent Activity
+          </span>
         </div>
 
         {logs.length === 0 ? (
@@ -272,19 +369,32 @@ export default function ProfileTab({
         ) : (
           <div className="divide-y divide-slate-800/40 max-h-48 overflow-y-auto styled-scrollbar">
             {logs.map((log) => (
-              <div key={log.id} className="p-3 flex items-center justify-between hover:bg-slate-800/5 transition">
+              <div
+                key={log.id}
+                className="p-3 flex items-center justify-between hover:bg-slate-800/5 transition"
+              >
                 <div className="space-y-0.5">
-                  <p className="text-[11px] font-extrabold text-slate-200">{log.title}</p>
-                  <p className="text-[9px] text-slate-500">{new Date(log.timestamp).toLocaleTimeString()}</p>
+                  <p className="text-[11px] font-extrabold text-slate-200">
+                    {log.title}
+                  </p>
+                  <p className="text-[9px] text-slate-500">
+                    {new Date(log.timestamp).toLocaleTimeString()}
+                  </p>
                 </div>
 
                 <div className="text-right space-y-0.5">
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                    log.token === 'GRAM (ton)' ? 'text-blue-400 bg-blue-500/10' : 'text-indigo-400 bg-indigo-500/10'
-                  }`}>
+                  <span
+                    className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                      log.token === "GRAM (ton)"
+                        ? "text-blue-400 bg-blue-500/10"
+                        : "text-indigo-400 bg-indigo-500/10"
+                    }`}
+                  >
                     {log.amount} {log.token}
                   </span>
-                  <p className="text-[8px] text-emerald-450 uppercase font-black tracking-wider leading-none mt-0.5">{log.status}</p>
+                  <p className="text-[8px] text-emerald-450 uppercase font-black tracking-wider leading-none mt-0.5">
+                    {log.status}
+                  </p>
                 </div>
               </div>
             ))}
@@ -303,8 +413,10 @@ export default function ProfileTab({
               className="bg-[#1c1c1e] w-full max-w-sm rounded-[24px] border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
             >
               <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                <h3 className="font-extrabold text-white text-lg">Profile Frame Theme</h3>
-                <button 
+                <h3 className="font-extrabold text-white text-lg">
+                  Profile Frame Theme
+                </h3>
+                <button
                   onClick={() => setShowBgModal(false)}
                   className="w-8 h-8 flex items-center justify-center bg-slate-800 text-slate-400 hover:text-white rounded-full transition"
                 >
@@ -318,13 +430,13 @@ export default function ProfileTab({
                     key={index}
                     onClick={() => handleSelectBg(index)}
                     className={`relative w-full h-24 rounded-2xl border-2 overflow-hidden transition-all duration-200 ${
-                      profileBgIndex === index 
-                        ? 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] scale-[1.02]' 
-                        : 'border-slate-800 hover:border-slate-600'
+                      profileBgIndex === index
+                        ? "border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] scale-[1.02]"
+                        : "border-slate-800 hover:border-slate-600"
                     }`}
                   >
                     {bg ? (
-                      <div 
+                      <div
                         className="absolute inset-0 bg-cover bg-center"
                         style={{ backgroundImage: `url(${bg})` }}
                       />
@@ -337,8 +449,12 @@ export default function ProfileTab({
                         <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                       </div>
                     )}
-                    
-                    {!bg && <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-slate-500 uppercase">Default</span>}
+
+                    {!bg && (
+                      <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-slate-500 uppercase">
+                        Default
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
