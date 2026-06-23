@@ -10,8 +10,10 @@ service cloud.firestore {
     // Primitive Definition
     function isSignedIn() { return request.auth != null; }
     function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isAdmin() { return isSignedIn(); } // Prototype mock
     function incoming() { return request.resource.data; }
     function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
 
     function isValidUser(data) {
       return data.keys().hasAll(['username']);
@@ -21,24 +23,58 @@ service cloud.firestore {
       return data.keys().hasAll(['type', 'title']);
     }
 
+    function isValidCustomTask(data) {
+      return data.keys().hasAll(['title', 'description', 'link', 'maxClicks', 'currentClicks', 'creatorId', 'status', 'createdAt'])
+             && data.title is string && data.title.size() <= 120
+             && data.description is string && data.description.size() <= 500
+             && data.link is string && data.link.size() <= 2000
+             && data.maxClicks is number
+             && data.currentClicks is number
+             && data.creatorId is string
+             && data.status is string
+             && data.createdAt is number;
+    }
+
+    function isValidUserTaskMapping(data) {
+      return data.keys().hasAll(['completedAt']) && data.completedAt is number;
+    }
+
     match /users/{userId} {
-      allow get, list: if true;
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
       allow create: if isOwner(userId) && isValidUser(incoming());
+      
       allow update: if isOwner(userId) && isValidUser(incoming());
 
       match /logs/{logId} {
-        allow list, get: if true;
+        allow list, get: if isOwner(userId);
         allow create: if isOwner(userId)
                     && isValidLog(incoming())
                     && exists(/databases/$(database)/documents/users/$(userId));
-        // Logs shouldn't be updated or deleted natively by the client
+        allow update, delete: if false;
+      }
+      
+      match /completedTasks/{taskId} {
+        allow list, get: if isOwner(userId);
+        allow create: if isOwner(userId)
+                    && isValidUserTaskMapping(incoming())
+                    && exists(/databases/$(database)/documents/users/$(userId))
+                    && exists(/databases/$(database)/documents/customTasks/$(taskId));
         allow update, delete: if false;
       }
     }
 
-    match /logs/{logId} {
-      allow list, get: if true;
-      allow create, update, delete: if false;
+    match /customTasks/{taskId} {
+      // allow fetching tasks to show to users
+      allow list, get: if isSignedIn();
+      allow create: if isSignedIn() && isValidCustomTask(incoming()) && incoming().creatorId == request.auth.uid;
+      allow update: if isSignedIn() && (
+        (incoming().diff(existing()).affectedKeys().hasOnly(['currentClicks'])
+         && incoming().currentClicks == existing().currentClicks + 1
+         && existing().currentClicks < existing().maxClicks) ||
+        (incoming().diff(existing()).affectedKeys().hasOnly(['status']))
+      ) && isValidCustomTask(incoming());
+      allow delete: if isSignedIn(); // Allow admin deletion for prototype
     }
   }
 }

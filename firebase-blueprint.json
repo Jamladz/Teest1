@@ -23,9 +23,10 @@
         "dailyCheckInCount": { "type": "number" },
         "telegramTasksCount": { "type": "number" },
         "airdropRegistered": { "type": "boolean" },
+        "airdropSignatureStatus": { "type": "string" },
         "miningEnergy": { "type": "number" }
       },
-      "required": ["username", "tonBalance", "gqhBalance"]
+      "required": ["username"]
     },
     "ActivityLog": {
       "title": "ActivityLog",
@@ -40,6 +41,31 @@
         "status": { "type": "string" }
       },
       "required": ["type", "title", "amount", "token", "timestamp"]
+    },
+    "CustomTask": {
+      "title": "CustomTask",
+      "description": "User created promoted task",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "link": { "type": "string" },
+        "maxClicks": { "type": "number" },
+        "currentClicks": { "type": "number" },
+        "creatorId": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["title", "description", "link", "maxClicks", "currentClicks", "creatorId", "status", "createdAt"]
+    },
+    "UserTaskMapping": {
+      "title": "UserTaskMapping",
+      "description": "Record of a user completing a task",
+      "type": "object",
+      "properties": {
+        "completedAt": { "type": "number" }
+      },
+      "required": ["completedAt"]
     }
   },
   "firestore": {
@@ -50,6 +76,14 @@
     "users/{userId}/logs/{logId}": {
       "schema": "ActivityLog",
       "description": "Contains user activity logs"
+    },
+    "users/{userId}/completedTasks/{taskId}": {
+      "schema": "UserTaskMapping",
+      "description": "Completed custom tasks"
+    },
+    "customTasks/{taskId}": {
+      "schema": "CustomTask",
+      "description": "Global custom tasks created by users"
     }
   }
 }
