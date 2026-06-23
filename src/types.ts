@@ -19,6 +19,7 @@ export interface UserState {
   gamesPlayedCount?: number;
   dailyReferralClaimedAt?: string | null;
   airdropRegistered?: boolean;
+  airdropSignatureStatus?: 'none' | 'under_review' | 'verified';
   miningEnergy?: number;
   profileBgIndex?: number;
   withdrawalCount?: number;
