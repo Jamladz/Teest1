@@ -1,0 +1,14 @@
+src/components/GameTab.tsx:                  Score: <strong className="text-yellow-400">High</strong>
+src/components/ProfileTab.tsx:              <strong className="font-extrabold text-slate-200">10 GRAM</strong>{" "}
+src/components/AdminTab.tsx:            <span>Community Tasks Review</span>
+src/components/AdminTab.tsx:            <span>System Status</span>
+src/components/CardMatchGame.tsx:                <span className="text-xs text-slate-400 uppercase">LAYERS</span>
+src/components/CardMatchGame.tsx:                <span className="text-lg font-bold text-white mt-1">5</span>
+src/components/TaskCenterModal.tsx:  onPayCustomTask: (tonAmount: string) => Promise<void>;
+src/components/TaskCenterModal.tsx:            An <strong>Admin will manually review</strong> and approve your task
+src/components/TaskCenterModal.tsx:                <span className="text-slate-500 text-xs ms-2">Min 500</span>
+src/components/TaskCenterModal.tsx:                <span className="text-xs text-slate-500">TON</span>
+src/components/HomeTab.tsx:  onPayCustomTask?: (tonAmount: string) => Promise<void>;
+src/components/HomeTab.tsx:  onPaySignature?: () => Promise<void>;
+src/components/HomeTab.tsx:                <strong className="text-green-500 font-bold">1 GQH</strong>{" "}
+src/components/HomeTab.tsx:                  <span>Exchange Standard Rate</span>
