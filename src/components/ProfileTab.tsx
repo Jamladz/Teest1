@@ -46,7 +46,7 @@ export default function ProfileTab({
   const { t, i18n } = useTranslation();
 
   // Generate unique link using Telegram ID if available, otherwise fallback to username
-  const refLink = `https://t.me/TonQashBot?startapp=ref_${user.telegramId || user.username.toLowerCase().replace(/\s+/g, "_")}`;
+  const refLink = `https://t.me/Gramqash_bot?startapp=ref_${user.telegramId || user.username.toLowerCase().replace(/\s+/g, "_")}`;
 
   const handleShareTelegram = () => {
     const text = encodeURIComponent("Join me on TonQash and earn real GRAM! Get +0.5 GRAM bonus:");
