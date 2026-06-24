@@ -63,5 +63,13 @@
   "telegram_joined_progress": "Каналы Telegram",
   "wallet_connected": "Кошелек подключен",
   "completed_100": "Завершено 100%",
-  "incomplete_0": "Не завершено 0%"
+  "incomplete_0": "Не завершено 0%",
+  "community_tasks_review": "Обзор задач сообщества",
+  "system_status": "Статус системы",
+  "layers": "СЛОИ",
+  "exchange_standard_rate": "Стандартный обменный курс",
+  "score_high": "Счет: Высокий",
+  "min_500": "Мин. 500",
+  "gqh_max": "GQH макс.",
+  "gqh_per_tap": "GQH за клик"
 }
