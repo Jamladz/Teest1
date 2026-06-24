@@ -504,7 +504,7 @@ export default function App() {
 
     if ((window as any).Adsgram) {
       const AdController = (window as any).Adsgram.init({
-        blockId: "int-36008",
+        blockId: "int-36108",
       });
       AdController.show()
         .then(() => {
@@ -678,14 +678,20 @@ export default function App() {
   };
 
   const handleClaimReferralBonus = () => {
-    const reward = Math.floor(Math.random() * 120) + 1;
+    const activeRefs = user.referralCount;
+    if (activeRefs === 0) {
+      triggerToast("Invite friends first to earn referral rewards!", "error");
+      return;
+    }
+    const reward = activeRefs * 25; // 25 GQH per active referral daily
     setUser((prev) => ({
       ...prev,
       gqhBalance: prev.gqhBalance + reward,
+      referralEarnings: prev.referralEarnings + reward,
       dailyReferralClaimedAt: new Date().toISOString(),
     }));
     addLog("bonus", "Daily Referral GQH Claim", `+${reward}.0`, "GQH");
-    triggerToast(`Claimed +${reward} GQH Bonus!`, "success");
+    triggerToast(`Claimed +${reward} GQH from ${activeRefs} referrals!`, "success");
   };
 
   return (
@@ -704,7 +710,7 @@ export default function App() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className={`absolute top-4 left-4 right-4 z-50 p-3.5 rounded-xl flex items-center justify-between border shadow-xl ${
+                className={`absolute top-4 start-4 end-4 z-50 p-3.5 rounded-xl flex items-center justify-between border shadow-xl ${
                   toast.type === "success"
                     ? "bg-emerald-950/95 border-emerald-555/30 text-emerald-350"
                     : toast.type === "error"
@@ -875,7 +881,7 @@ export default function App() {
 
           {/* BOTTOM FLOATING NAVIGATION BAR */}
           {!activeGame && (
-            <nav className="absolute bottom-4 left-4 right-4 z-50 border border-white/10 bg-slate-950/50 backdrop-blur-3xl px-2 py-3 rounded-2xl flex justify-around shrink-0 select-none shadow-[0_8px_32px_-4px_rgba(0,0,0,0.5)]">
+            <nav className="absolute bottom-4 start-4 end-4 z-50 border border-white/10 bg-slate-950/50 backdrop-blur-3xl px-2 py-3 rounded-2xl flex justify-around shrink-0 select-none shadow-[0_8px_32px_-4px_rgba(0,0,0,0.5)]">
               <button
                 onClick={() => setActiveTab("home")}
                 className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all duration-300 ${
@@ -1160,7 +1166,7 @@ export default function App() {
                     </p>
                   </div>
 
-                  <div className="text-left space-y-2 bg-slate-900 p-3.5 rounded-xl border border-slate-800/60 text-xs">
+                  <div className="text-start space-y-2 bg-slate-900 p-3.5 rounded-xl border border-slate-800/60 text-xs">
                     <div className="flex justify-between text-slate-400">
                       <span>Destination wallet</span>
                       <span className="font-mono text-indigo-400">
@@ -1384,8 +1390,8 @@ export default function App() {
 
                 {/* Ad Graphic Board Mockup */}
                 <div className="flex-1 flex flex-col items-center justify-center space-y-6 text-center max-w-md mx-auto relative px-4">
-                  <div className="absolute top-24 left-10 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl animate-pulse pointer-events-none" />
-                  <div className="absolute bottom-24 right-10 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl animate-pulse pointer-events-none" />
+                  <div className="absolute top-24 start-10 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl animate-pulse pointer-events-none" />
+                  <div className="absolute bottom-24 end-10 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl animate-pulse pointer-events-none" />
 
                   <div className="space-y-4">
                     <div className="w-20 h-20 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto shadow-lg">

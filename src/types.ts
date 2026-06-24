@@ -1,5 +1,6 @@
 export interface UserState {
   username: string;
+  telegramId?: number | null;
   avatar: string;
   tonBalance: number;
   gqhBalance: number;
