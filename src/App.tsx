@@ -37,7 +37,7 @@ import AdminTab from "./components/AdminTab";
 import DropBlastGame from "./components/DropBlastGame";
 import CryptoRunnerGame from "./components/CryptoRunnerGame";
 import CardMatchGame from "./components/CardMatchGame";
-import LoadingPage from "./components/LoadingPage";
+
 import { useTranslation } from "react-i18next";
 
 // Static config
@@ -49,7 +49,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<
     "home" | "tasks" | "games" | "profile" | "admin"
   >("home");
-  const [showLoading, setShowLoading] = useState(true);
+  const [showLoading, setShowLoading] = useState(false);
 
   // Real GRAM price
   const [tonPrice, setTonPrice] = useState(FALLBACK_TON_PRICE);
@@ -177,13 +177,8 @@ export default function App() {
     }
   }, [user.hasClaimedWelcomeBonus]);
 
-  // Loading page timer
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLoading(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
+// Removed loading page
+
 
   // Parse Referral Command on Load
   useEffect(() => {
@@ -696,13 +691,7 @@ export default function App() {
 
   return (
     <>
-      <AnimatePresence>
-        {showLoading && (
-          <LoadingPage onComplete={() => setShowLoading(false)} />
-        )}
-      </AnimatePresence>
-      {!showLoading && (
-        <div className="w-screen h-[100dvh] bg-black text-white font-sans overflow-hidden relative select-none flex flex-col mx-auto w-full md:max-w-md md:border-x border-slate-800">
+      <div className="w-screen h-[100dvh] bg-black text-white font-sans overflow-hidden relative select-none flex flex-col mx-auto w-full md:max-w-md md:border-x border-slate-800">
           {/* Dynamic Slide Toast Banner inside phone frame */}
           <AnimatePresence>
             {toast && (
@@ -1445,7 +1434,6 @@ export default function App() {
             )}
           </AnimatePresence>
         </div>
-      )}
     </>
   );
 }
