@@ -79,7 +79,7 @@ export default function TasksTab({
   }, []);
 
   const handleShareClick = () => {
-    const refLink = `https://t.me/TonQashBot?startapp=ref_${user.telegramId || user.username.toLowerCase().replace(/\s+/g, "_")}`;
+    const refLink = `https://t.me/Gramqash_bot?startapp=ref_${user.telegramId || user.username.toLowerCase().replace(/\s+/g, "_")}`;
     const text = "Join me on TonQash and earn real GRAM!";
     const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent(text)}`;
 
