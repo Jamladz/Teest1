@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   collection,
   query,
@@ -23,6 +24,7 @@ import { motion } from "motion/react";
 import { CustomPromotedTask } from "./TaskCenterModal";
 
 export default function AdminTab() {
+  const { t } = useTranslation();
   const [totalUsers, setTotalUsers] = useState(0);
   const [activeUsers, setActiveUsers] = useState(0);
   const [withdrawals, setWithdrawals] = useState(0);
@@ -135,7 +137,7 @@ export default function AdminTab() {
             transition={{ delay: 0.2 }}
             className="bg-cyan-950/30 border border-cyan-500/20 p-4 rounded-2xl flex flex-col items-center text-center shadow-lg relative overflow-hidden"
           >
-            <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-ping" />
+            <div className="absolute top-2 end-2 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-ping" />
             <Activity className="w-6 h-6 text-cyan-400 mb-2" />
             <span className="text-2xl font-black text-white">
               {activeUsers}
@@ -164,7 +166,7 @@ export default function AdminTab() {
         {/* Custom Tasks Admin Review Section */}
         <div className="bg-[#1c1c1e] border border-slate-800 rounded-2xl p-4 mb-6">
           <h3 className="text-sm font-bold text-slate-200 mb-4 flex justify-between items-center">
-            <span>Community Tasks Review</span>
+            <span>{t("community_tasks_review", "Community Tasks Review")}</span>
             <span className="text-[10px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded uppercase font-bold tracking-wider">
               {customTasks.length} Total
             </span>
@@ -256,7 +258,7 @@ export default function AdminTab() {
         {/* Security Logs Simulator */}
         <div className="bg-[#1c1c1e] border border-slate-800 rounded-2xl p-4">
           <h3 className="text-xs font-bold text-slate-300 mb-3 flex justify-between items-center">
-            <span>System Status</span>
+            <span>{t("system_status", "System Status")}</span>
             <span className="text-[10px] bg-green-500/10 text-green-500 px-2 py-0.5 rounded uppercase font-mono">
               Online
             </span>

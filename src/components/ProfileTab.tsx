@@ -45,8 +45,8 @@ export default function ProfileTab({
   const [showBgModal, setShowBgModal] = useState(false);
   const { t, i18n } = useTranslation();
 
-  // Generate unique link
-  const refLink = `https://t.me/TonQashBot/app?startapp=ref_${user.username.toLowerCase().replace(/\s+/g, "_")}`;
+  // Generate unique link using Telegram ID if available, otherwise fallback to username
+  const refLink = `https://t.me/TonQashBot?start=${user.telegramId || user.username.toLowerCase().replace(/\s+/g, "_")}`;
 
   const handleShareTelegram = () => {
     const text = encodeURIComponent("Join me on TonQash and earn real GRAM! Get +0.5 GRAM bonus:");
@@ -70,9 +70,10 @@ export default function ProfileTab({
   const hasEnoughForWithdrawal = user.tonBalance >= 10.0;
 
   const canClaimReferral =
-    !user.dailyReferralClaimedAt ||
+    user.referralCount > 0 &&
+    (!user.dailyReferralClaimedAt ||
     new Date().getTime() - new Date(user.dailyReferralClaimedAt).getTime() >
-      86400000;
+      86400000);
 
   const handleSelectBg = (index: number) => {
     if (onUpdateProfileBg) onUpdateProfileBg(index);
@@ -99,7 +100,7 @@ export default function ProfileTab({
         ) : (
           <div className="absolute inset-0 bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 z-0 pointer-events-none" />
         )}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-tr from-purple-500/10 to-indigo-500/10 rounded-full blur-3xl pointer-events-none z-0" />
+        <div className="absolute top-0 end-0 w-32 h-32 bg-gradient-to-tr from-purple-500/10 to-indigo-500/10 rounded-full blur-3xl pointer-events-none z-0" />
 
         <div className="relative z-10">
           <div className="relative">
@@ -109,7 +110,7 @@ export default function ProfileTab({
               </span>
             </div>
           </div>
-          <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full animate-pulse z-20" />
+          <span className="absolute bottom-0 end-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full animate-pulse z-20" />
         </div>
 
         <div className="space-y-0.5 relative z-10 flex items-center gap-2">
@@ -240,7 +241,7 @@ export default function ProfileTab({
           >
             <Sparkles className="w-4 h-4" />
             {canClaimReferral
-              ? "Claim Daily GQH Bonus (Up to 120 GQH)"
+              ? `Claim Daily Bonus (${user.referralCount * 25} GQH)`
               : "Bonus Claimed Today"}
           </button>
         </div>
@@ -382,7 +383,7 @@ export default function ProfileTab({
                   </p>
                 </div>
 
-                <div className="text-right space-y-0.5">
+                <div className="text-end space-y-0.5">
                   <span
                     className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                       log.token === "GRAM (ton)"
@@ -445,7 +446,7 @@ export default function ProfileTab({
                     )}
 
                     {profileBgIndex === index && (
-                      <div className="absolute top-2 right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                      <div className="absolute top-2 end-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
                         <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                       </div>
                     )}

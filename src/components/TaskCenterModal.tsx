@@ -203,7 +203,7 @@ export function TaskCenterModal({
         className="space-y-6"
       >
         <div className="bg-slate-900 p-5 rounded-2xl border border-blue-500/20 shadow-lg relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl pointer-events-none rounded-full" />
+          <div className="absolute top-0 end-0 w-32 h-32 bg-blue-500/10 blur-3xl pointer-events-none rounded-full" />
           <h3 className="text-lg font-black text-white mb-1">
             Create Ads / Task
           </h3>
@@ -245,13 +245,13 @@ export function TaskCenterModal({
                 Target Link (URL/Bot)
               </label>
               <div className="relative">
-                <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <Link2 className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
                   type="url"
                   value={taskLink}
                   onChange={(e) => setTaskLink(e.target.value)}
                   placeholder="https://t.me/your_bot"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 ps-10 pe-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
                 />
               </div>
             </div>
@@ -261,7 +261,7 @@ export function TaskCenterModal({
                 Number of Clicks / Visitors
               </label>
               <div className="flex items-center gap-4 bg-slate-950 border border-slate-800 rounded-xl p-2 relative">
-                <span className="text-slate-500 text-xs ml-2">Min 500</span>
+                <span className="text-slate-500 text-xs ms-2">{t("min_500", "Min 500")}</span>
                 <input
                   type="range"
                   min="500"
@@ -276,7 +276,7 @@ export function TaskCenterModal({
                 <span className="text-3xl font-black text-blue-400">
                   {clicksCount}
                 </span>
-                <span className="text-slate-500 text-xs ml-1 uppercase">
+                <span className="text-slate-500 text-xs ms-1 uppercase">
                   Clicks
                 </span>
               </div>

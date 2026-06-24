@@ -79,7 +79,7 @@ export default function TasksTab({
   }, []);
 
   const handleShareClick = () => {
-    const refLink = `https://t.me/TonQashBot/app?startapp=ref_${user.username.toLowerCase().replace(/\s+/g, "_")}`;
+    const refLink = `https://t.me/TonQashBot?start=${user.telegramId || user.username.toLowerCase().replace(/\s+/g, "_")}`;
     const text = "Join me on TonQash and earn real GRAM!";
     const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent(text)}`;
 
@@ -227,7 +227,7 @@ export default function TasksTab({
 
   return (
     <div className="space-y-4">
-      <div className="text-left py-1.5">
+      <div className="text-start py-1.5">
         <h2 className="text-xl font-black text-white tracking-tight">
           Earning Tasks
         </h2>
@@ -377,7 +377,7 @@ export default function TasksTab({
 
       {/* 5. App / Partner Tasks */}
       <div className="pt-4 mt-4 border-t border-slate-800 space-y-4">
-        <div className="text-left">
+        <div className="text-start">
           <h2 className="text-lg font-black text-white tracking-tight">
             App Tasks
           </h2>
@@ -472,7 +472,7 @@ export default function TasksTab({
       {/* 6. Custom User Added Tasks */}
       {customTasks.length > 0 && (
         <div className="pt-4 mt-4 border-t border-slate-800 space-y-4">
-          <div className="text-left">
+          <div className="text-start">
             <h2 className="text-lg font-black text-white tracking-tight">
               Community Tasks
             </h2>

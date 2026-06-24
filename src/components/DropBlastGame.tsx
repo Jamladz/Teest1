@@ -654,7 +654,7 @@ export default function DropBlastGame({
   const confirmFinish = () => {
     if (rewardTqh > 0 && (window as any).Adsgram) {
       const AdController = (window as any).Adsgram.init({
-        blockId: "int-36010",
+        blockId: "int-36109",
       });
       AdController.show()
         .then(() => {
@@ -674,7 +674,7 @@ export default function DropBlastGame({
       className="absolute inset-0 bg-[#0f172a] text-slate-100 flex flex-col z-[2000] overflow-hidden"
     >
       {/* Game Headings/UI HUD */}
-      <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-auto z-[2001] px-2">
+      <div className="absolute top-4 start-4 end-4 flex items-center justify-between pointer-events-auto z-[2001] px-2">
         <div className="flex gap-2">
           <div className="bg-slate-900/80 border border-slate-700/50 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-2">
             <img
@@ -778,7 +778,7 @@ export default function DropBlastGame({
             </div>
 
             {/* Instructions */}
-            <div className="text-left bg-slate-900/80 border border-slate-800 p-4 rounded-2xl w-full text-xs space-y-2 text-slate-400">
+            <div className="text-start bg-slate-900/80 border border-slate-800 p-4 rounded-2xl w-full text-xs space-y-2 text-slate-400">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 bg-yellow-400 rounded-full" />
                 <span>Coin: +100 Score</span>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Trophy, RefreshCw } from "lucide-react";
 
@@ -43,6 +44,7 @@ export default function CardMatchGame({
   onCollect,
   onExit,
 }: CardMatchGameProps) {
+  const { t } = useTranslation();
   const [board, setBoard] = useState<Card[]>([]);
   const [slots, setSlots] = useState<Card[]>([]);
   const [score, setScore] = useState(0);
@@ -183,7 +185,7 @@ export default function CardMatchGame({
     const rewardTqh = Math.floor(score / 50);
     if (rewardTqh > 0 && (window as any).Adsgram) {
       const AdController = (window as any).Adsgram.init({
-        blockId: "int-36012",
+        blockId: "int-36111",
       });
       AdController.show()
         .then(() => {
@@ -231,7 +233,7 @@ export default function CardMatchGame({
               </div>
               <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl flex flex-col items-center">
                 <RefreshCw className="w-5 h-5 text-emerald-400 mb-1" />
-                <span className="text-xs text-slate-400 uppercase">LAYERS</span>
+                <span className="text-xs text-slate-400 uppercase">{t("layers", "LAYERS")}</span>
                 <span className="text-lg font-bold text-white mt-1">5</span>
               </div>
             </div>

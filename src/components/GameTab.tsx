@@ -58,7 +58,7 @@ export default function GameTab({ user, onLaunchGame }: GameTabProps) {
 
   return (
     <div className="space-y-4">
-      <div className="text-left py-1.5">
+      <div className="text-start py-1.5">
         <h2 className="text-xl font-black text-white tracking-tight">
           Game Arena
         </h2>
@@ -71,17 +71,17 @@ export default function GameTab({ user, onLaunchGame }: GameTabProps) {
       <div className="grid gap-4">
         {/* Game 1: BB Drop Blast */}
         <div className="bg-gradient-to-br from-[#0e163d]/50 via-[#070b1e]/50 to-[#0b102c]/50 border border-blue-550/20 rounded-2xl overflow-hidden shadow-xl relative group">
-          <div className="absolute top-3 right-3 bg-sky-500 text-slate-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-full z-10 tracking-widest leading-none">
+          <div className="absolute top-3 end-3 bg-sky-500 text-slate-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-full z-10 tracking-widest leading-none">
             Popular
           </div>
 
           {/* Styled Background Visual banner (Compressed style) */}
           <div className="h-24 bg-gradient-to-r from-[#0d163c] to-[#04060f] relative overflow-hidden flex items-center justify-center border-b border-slate-800">
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 to-transparent z-[1]" />
-            <div className="absolute top-2 left-6 w-8 h-8 rounded-full border border-yellow-500/10 bg-yellow-500/5 animate-bounce flex items-center justify-center text-yellow-500/20 text-[10px] font-bold">
+            <div className="absolute top-2 start-6 w-8 h-8 rounded-full border border-yellow-500/10 bg-yellow-500/5 animate-bounce flex items-center justify-center text-yellow-500/20 text-[10px] font-bold">
               TQ
             </div>
-            <div className="absolute bottom-2 right-8 w-10 h-10 rounded-full border border-sky-500/10 bg-sky-500/5 animate-pulse flex items-center justify-center text-sky-500/20 text-xs font-bold">
+            <div className="absolute bottom-2 end-8 w-10 h-10 rounded-full border border-sky-500/10 bg-sky-500/5 animate-pulse flex items-center justify-center text-sky-500/20 text-xs font-bold">
               ★
             </div>
 
@@ -141,17 +141,17 @@ export default function GameTab({ user, onLaunchGame }: GameTabProps) {
 
         {/* Game 2: Crypto Runner */}
         <div className="bg-gradient-to-br from-[#0c241e]/50 via-[#040c09]/50 to-[#0c1814]/50 border border-emerald-550/25 rounded-2xl overflow-hidden shadow-xl relative group">
-          <div className="absolute top-3 right-3 bg-green-500 text-slate-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-full z-10 tracking-widest leading-none">
+          <div className="absolute top-3 end-3 bg-green-500 text-slate-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-full z-10 tracking-widest leading-none">
             New
           </div>
 
           {/* Styled Background Visual banner (Compressed style) */}
           <div className="h-24 bg-gradient-to-r from-[#032d20] to-[#010a08] relative overflow-hidden flex items-center justify-center border-b border-emerald-500/15">
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 to-transparent z-[1]" />
-            <div className="absolute top-2 right-6 w-8 h-8 rounded-full border border-emerald-500/10 bg-green-500/5 animate-pulse flex items-center justify-center text-emerald-500/20 text-[10px] font-bold">
+            <div className="absolute top-2 end-6 w-8 h-8 rounded-full border border-emerald-500/10 bg-green-500/5 animate-pulse flex items-center justify-center text-emerald-500/20 text-[10px] font-bold">
               $
             </div>
-            <div className="absolute bottom-2 left-6 w-6 h-6 rounded-full border border-teal-500/15 bg-teal-500/5 animate-bounce flex items-center justify-center text-teal-400/25 text-[9px] font-bold">
+            <div className="absolute bottom-2 start-6 w-6 h-6 rounded-full border border-teal-500/15 bg-teal-500/5 animate-bounce flex items-center justify-center text-teal-400/25 text-[9px] font-bold">
               ₿
             </div>
 
@@ -212,7 +212,7 @@ export default function GameTab({ user, onLaunchGame }: GameTabProps) {
 
         {/* Game 3: Token Matcher */}
         <div className="bg-gradient-to-br from-[#1c142c]/50 via-[#0a0712]/50 to-[#120e24]/50 border border-purple-500/20 rounded-2xl overflow-hidden shadow-xl relative group">
-          <div className="absolute top-3 right-3 bg-purple-500 text-slate-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-full z-10 tracking-widest leading-none">
+          <div className="absolute top-3 end-3 bg-purple-500 text-slate-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-full z-10 tracking-widest leading-none">
             New
           </div>
 
@@ -248,7 +248,7 @@ export default function GameTab({ user, onLaunchGame }: GameTabProps) {
               <div className="flex items-center gap-1.5 text-slate-450">
                 <Trophy className="w-3.5 h-3.5 text-yellow-400" />
                 <span>
-                  Score: <strong className="text-yellow-400">High</strong>
+                  {t("score_high", "Score: High").replace("High", "")} <strong className="text-yellow-400">High</strong>
                 </span>
               </div>
             </div>

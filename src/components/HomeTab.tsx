@@ -126,7 +126,7 @@ export default function HomeTab({
   onShowToast,
   profileBgIndex = 0,
 }: HomeTabProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   // Navigation active view inside Home: 'convert' or 'airdrop'
   const [homeSubTab, setHomeSubTab] = useState<"convert" | "airdrop">(
     "airdrop",
@@ -446,8 +446,19 @@ export default function HomeTab({
           </div>
         </div>
 
-        {/* Haptic / Sound fast preference triggers */}
+        {/* Haptic / Sound fast preference triggers & Language Toggle */}
         <div className="flex gap-1.5 bg-slate-950/30 p-1 rounded-xl border border-blue-900/10">
+          <button
+            onClick={() => {
+              const nextLang = i18n.language === "en" ? "ar" : "en";
+              i18n.changeLanguage(nextLang);
+              document.documentElement.dir = nextLang === "ar" ? "rtl" : "ltr";
+            }}
+            className="p-1.5 rounded-lg transition text-xs font-black text-slate-300 bg-slate-800/50 hover:bg-slate-700 flex items-center justify-center min-w-[32px]"
+            title="Change Language"
+          >
+            {i18n.language === "ar" ? "EN" : "عربي"}
+          </button>
           <button
             onClick={() => handleTogglePreference("sound")}
             className={`p-1.5 rounded-lg transition ${
@@ -483,16 +494,16 @@ export default function HomeTab({
         className="w-full bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm py-3 rounded-2xl border border-blue-500/30 shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
       >
         <Target className="w-4 h-4" />
-        Add Task
+        {t("add_task")}
       </button>
 
       {/* 2. Total estimated balance card */}
       <div className="relative overflow-hidden bg-gradient-to-br from-[#0c1233]/70 via-[#070b1e]/60 to-[#0e163b]/50 border border-slate-800 backdrop-blur-xl rounded-2xl p-4 text-center space-y-1.5 shadow-sm select-none">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 end-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute bottom-0 start-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl pointer-events-none" />
 
         <span className="text-slate-400 font-medium text-[10px] tracking-widest uppercase">
-          Total Estimated Yield
+          {t("total_estimated_yield")}
         </span>
         <h2 className="text-3.5xl font-black tracking-tight text-white flex items-center justify-center gap-2">
           <img
@@ -514,7 +525,7 @@ export default function HomeTab({
         {/* Mini progress to next league cap */}
         <div className="pt-2 max-w-[240px] mx-auto space-y-1">
           <div className="flex justify-between items-center text-[8px] uppercase tracking-wider font-extrabold text-blue-400/70">
-            <span>Leagues Progression</span>
+            <span>{t("leagues_progression")}</span>
             <span>{Math.floor(leagueCapPercent)}%</span>
           </div>
           <div className="w-full bg-slate-950/70 h-1.5 rounded-full border border-blue-950/40 overflow-hidden">
@@ -537,7 +548,7 @@ export default function HomeTab({
           }`}
         >
           <Gift className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
-          🎁 GramQash Airdrop
+          {t("gramqash_airdrop")}
         </button>
         <button
           onClick={() => setHomeSubTab("convert")}
@@ -548,7 +559,7 @@ export default function HomeTab({
           }`}
         >
           <ArrowLeftRight className="w-3.5 h-3.5" />
-          💎 Wallet &amp; Convert
+          {t("wallet_convert")}
         </button>
       </div>
 
@@ -566,33 +577,32 @@ export default function HomeTab({
             className="flex flex-col space-y-4"
           >
             {/* Live Campaign Status Badge Banner */}
-            <div className="bg-gradient-to-r from-cyan-950/40 via-blue-950/30 to-[#030718] border border-cyan-500/15 rounded-2xl p-4 relative overflow-hidden shadow-lg select-none text-left">
+            <div className="bg-gradient-to-r from-cyan-950/40 via-blue-950/30 to-[#030718] border border-cyan-500/15 rounded-2xl p-4 relative overflow-hidden shadow-lg select-none text-start">
               <div className="flex flex-col mb-1 relative z-10">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-2">
                   <h3 className="font-extrabold text-[#f1f5f9] text-base leading-snug flex items-center justify-start gap-1.5 flex-1">
-                    Strategic AirDrop
+                    {t("strategic_airdrop")}
                     <Sparkles className="w-4 h-4 text-blue-500 shrink-0" />
                   </h3>
                   <div className="flex w-fit items-center gap-1.5 bg-blue-500/15 border border-cyan-500/25 px-2.5 py-1 rounded-full shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping shrink-0" />
                     <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest font-mono whitespace-nowrap">
-                      Snapshot Active
+                      {t("snapshot_active")}
                     </span>
                   </div>
                 </div>
                 <p className="text-[11px] text-slate-400 leading-normal font-medium mt-1">
-                  Secure your verified allocation from GramQash reward pool
-                  before the final snapshot (Snapshot Ledger).
+                  {t("secure_allocation")}
                 </p>
               </div>
             </div>
 
             {/* Countdown Clock Panel */}
             <div className="bg-[#1c1c1e]/95 border border-slate-800 rounded-2xl p-3.5 space-y-2.5 text-center shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-20 h-20 bg-blue-500/5 rounded-full blur-xl pointer-events-none" />
+              <div className="absolute top-0 start-0 w-20 h-20 bg-blue-500/5 rounded-full blur-xl pointer-events-none" />
               <div className="flex items-center justify-center gap-1.5 text-xs text-blue-300 font-extrabold pb-1 border-b border-blue-950/20">
                 <Clock className="w-3.5 h-3.5 text-blue-500" />
-                <span>Countdown to snapshot closure</span>
+                <span>{t("countdown_snapshot")}</span>
               </div>
 
               {timeLeft > 0 ? (
@@ -604,7 +614,7 @@ export default function HomeTab({
                       ).padStart(2, "0")}
                     </span>
                     <span className="text-[8px] uppercase text-slate-400 font-bold mt-1 block">
-                      Days
+                      {t("days")}
                     </span>
                   </div>
                   <div className="bg-slate-800/15 border border-slate-800 p-2 rounded-xl">
@@ -616,7 +626,7 @@ export default function HomeTab({
                       ).padStart(2, "0")}
                     </span>
                     <span className="text-[8px] uppercase text-slate-400 font-bold mt-1 block">
-                      Hours
+                      {t("hours")}
                     </span>
                   </div>
                   <div className="bg-slate-800/15 border border-slate-800 p-2 rounded-xl">
@@ -626,7 +636,7 @@ export default function HomeTab({
                       ).padStart(2, "0")}
                     </span>
                     <span className="text-[8px] uppercase text-slate-400 font-bold mt-1 block">
-                      Minutes
+                      {t("minutes")}
                     </span>
                   </div>
                   <div className="bg-slate-800/15 border border-slate-800 p-2 rounded-xl">
@@ -636,19 +646,19 @@ export default function HomeTab({
                       ).padStart(2, "0")}
                     </span>
                     <span className="text-[8px] uppercase text-slate-400 font-bold mt-1 block">
-                      Seconds
+                      {t("seconds")}
                     </span>
                   </div>
                 </div>
               ) : (
                 <p className="text-sm font-black text-red-400">
-                  🚨 AirDrop snapshot has been taken!
+                  {t("airdrop_snapshot_taken")}
                 </p>
               )}
             </div>
 
             {/* Global Pool Allocation Tracker */}
-            <div className="bg-slate-950/90 border border-slate-800 rounded-2xl p-3.5 space-y-2 text-left">
+            <div className="bg-slate-950/90 border border-slate-800 rounded-2xl p-3.5 space-y-2 text-start">
               <div className="flex justify-between items-center text-[10px]">
                 <span className="text-blue-500/90 font-mono font-bold">
                   {(() => {
@@ -666,12 +676,12 @@ export default function HomeTab({
                   })()}
                 </span>
                 <span className="font-extrabold text-slate-300">
-                  Reward Pool Consumption
+                  {t("reward_pool_consumption")}
                 </span>
               </div>
               <div className="relative w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-blue-950">
                 <div
-                  className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 rounded-full transition-all duration-500 shadow-sm"
+                  className="absolute top-0 bottom-0 start-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 rounded-full transition-all duration-500 shadow-sm"
                   style={{
                     width: `${(() => {
                       const base = 3000000;
@@ -687,7 +697,7 @@ export default function HomeTab({
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse" />
               </div>
               <p className="text-[9px] text-slate-500 text-center font-bold">
-                Distributed{" "}
+                {t("distributed_rewards")}{" "}
                 <span className="text-blue-500">
                   {(() => {
                     const base = 3000000;
@@ -703,7 +713,7 @@ export default function HomeTab({
                   })()}
                   %
                 </span>{" "}
-                of total rewards to active GramQash farmers
+                {t("of_total_rewards")}
               </p>
             </div>
 
@@ -719,14 +729,14 @@ export default function HomeTab({
                 </h4>
               </div>
 
-              <p className="text-[10px] text-slate-300 leading-normal text-left">
+              <p className="text-[10px] text-slate-300 leading-normal text-start">
                 Test your reward growth! Adjust default expectation sliders to
                 increase future GRAM allocation:
               </p>
 
               <div className="space-y-3">
                 {/* GQH slider */}
-                <div className="space-y-1.5 text-left">
+                <div className="space-y-1.5 text-start">
                   <div className="flex justify-between items-center text-[10px]">
                     <span className="text-slate-400 font-bold">
                       Expected GQH balance:
@@ -747,7 +757,7 @@ export default function HomeTab({
                 </div>
 
                 {/* Invites slider */}
-                <div className="space-y-1.5 text-left">
+                <div className="space-y-1.5 text-start">
                   <div className="flex justify-between items-center text-[10px]">
                     <span className="text-slate-400 font-bold">
                       Expected invitees count:
@@ -816,7 +826,7 @@ export default function HomeTab({
                 <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-slate-800 text-blue-400 shrink-0">
                   <Shield className="w-3.5 h-3.5 text-blue-500" />
                 </div>
-                <div className="text-left flex-1">
+                <div className="text-start flex-1">
                   <h4 className="font-extrabold text-xs text-slate-100 leading-none">
                     Activity Proof & Financial Address
                   </h4>
@@ -826,7 +836,7 @@ export default function HomeTab({
                 </div>
               </div>
 
-              <p className="text-[10px] text-slate-300 leading-relaxed text-left">
+              <p className="text-[10px] text-slate-300 leading-relaxed text-start">
                 Broadcast the digital signature document to secure your
                 allocation on GRAM blockchain and officially authorize claim
                 paths for public distribution.
@@ -861,7 +871,7 @@ export default function HomeTab({
                   <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
                     <Clock className="w-5 h-5 animate-pulse" />
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="text-[10px] font-black text-amber-500 leading-none">
                       Under Review
                     </p>
@@ -878,7 +888,7 @@ export default function HomeTab({
                   <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 shrink-0">
                     <BadgeCheck className="w-5 h-5 animate-bounce" />
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="text-[10px] font-black text-green-500 leading-none">
                       Smart contract signature fully verified
                     </p>
@@ -926,12 +936,12 @@ export default function HomeTab({
               <div className="divide-y divide-blue-950/40 px-1 font-sans">
                 {/* Condition 1: Connected GRAM Wallet */}
                 <div className="py-2.5 px-2 flex flex-row items-center justify-between text-xs">
-                  <div className="space-y-0.5 text-left">
+                  <div className="space-y-0.5 text-start">
                     <p className="font-bold text-slate-100 flex items-center gap-1.5">
                       <Wallet className="w-3.5 h-3.5 text-slate-400" />
                       Wallet Connected
                     </p>
-                    <p className="text-[9px] text-slate-400 ml-5 border-l border-slate-700 pl-2">
+                    <p className="text-[9px] text-slate-400 ms-5 border-s border-slate-700 ps-2">
                       Total connection verifications.
                     </p>
                   </div>
@@ -948,12 +958,12 @@ export default function HomeTab({
 
                 {/* Condition 2: Total GQH Balance */}
                 <div className="py-2.5 px-2 flex flex-row items-center justify-between text-xs">
-                  <div className="space-y-0.5 text-left">
+                  <div className="space-y-0.5 text-start">
                     <p className="font-bold text-slate-100 flex items-center gap-1.5">
                       <Zap className="w-3.5 h-3.5 text-slate-400" />
                       GQH Coins Amount
                     </p>
-                    <p className="text-[9px] text-slate-400 ml-5 border-l border-slate-700 pl-2">
+                    <p className="text-[9px] text-slate-400 ms-5 border-s border-slate-700 ps-2">
                       Your total gathered holdings.
                     </p>
                   </div>
@@ -964,12 +974,12 @@ export default function HomeTab({
 
                 {/* Condition 3: Telegram Tasks */}
                 <div className="py-2.5 px-2 flex flex-row items-center justify-between text-xs">
-                  <div className="space-y-0.5 text-left">
+                  <div className="space-y-0.5 text-start">
                     <p className="font-bold text-slate-100 flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-slate-400" />
                       Tasks Completed
                     </p>
-                    <p className="text-[9px] text-slate-400 ml-5 border-l border-slate-700 pl-2">
+                    <p className="text-[9px] text-slate-400 ms-5 border-s border-slate-700 ps-2">
                       Participated social network campaigns.
                     </p>
                   </div>
@@ -980,12 +990,12 @@ export default function HomeTab({
 
                 {/* Condition 4: Watched Ads */}
                 <div className="py-2.5 px-2 flex flex-row items-center justify-between text-xs">
-                  <div className="space-y-0.5 text-left">
+                  <div className="space-y-0.5 text-start">
                     <p className="font-bold text-slate-100 flex items-center gap-1.5">
                       <PlayCircle className="w-3.5 h-3.5 text-slate-400" />
                       Ads Watched
                     </p>
-                    <p className="text-[9px] text-slate-400 ml-5 border-l border-slate-700 pl-2">
+                    <p className="text-[9px] text-slate-400 ms-5 border-s border-slate-700 ps-2">
                       Total advertisements completed.
                     </p>
                   </div>
@@ -996,12 +1006,12 @@ export default function HomeTab({
 
                 {/* Condition 5: Daily Check-ins */}
                 <div className="py-2.5 px-2 flex flex-row items-center justify-between text-xs">
-                  <div className="space-y-0.5 text-left">
+                  <div className="space-y-0.5 text-start">
                     <p className="font-bold text-slate-100 flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 text-slate-400" />
                       Daily Logins
                     </p>
-                    <p className="text-[9px] text-slate-400 ml-5 border-l border-slate-700 pl-2">
+                    <p className="text-[9px] text-slate-400 ms-5 border-s border-slate-700 ps-2">
                       Daily streaks and interactions.
                     </p>
                   </div>
@@ -1012,12 +1022,12 @@ export default function HomeTab({
 
                 {/* Condition 6: Games Played */}
                 <div className="py-2.5 px-2 flex flex-row items-center justify-between text-xs">
-                  <div className="space-y-0.5 text-left">
+                  <div className="space-y-0.5 text-start">
                     <p className="font-bold text-slate-100 flex items-center gap-1.5">
                       <Gamepad2 className="w-3.5 h-3.5 text-slate-400" />
                       Games Played
                     </p>
-                    <p className="text-[9px] text-slate-400 ml-5 border-l border-slate-700 pl-2">
+                    <p className="text-[9px] text-slate-400 ms-5 border-s border-slate-700 ps-2">
                       Total sessions of mini-games.
                     </p>
                   </div>
@@ -1029,7 +1039,7 @@ export default function HomeTab({
             </div>
 
             {/* CREATIVE FEATURE 1: Sleek Diagnostic Blockchain GAS FUEL Tank Status Indicator */}
-            <div className="bg-gradient-to-r from-[#03071b] to-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-md sm:text-left text-right font-sans">
+            <div className="bg-gradient-to-r from-[#03071b] to-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-md sm:text-start text-end font-sans">
               <div className="flex flex-row-reverse sm:flex-row justify-between items-center pb-2 border-b border-blue-950/40">
                 <span className="text-[8px] bg-indigo-500/10 text-indigo-400 font-bold px-2 py-0.5 rounded-md border border-indigo-500/15 font-mono uppercase">
                   SAFETY AUDIT
@@ -1042,7 +1052,7 @@ export default function HomeTab({
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-xl bg-slate-900/60 border border-blue-950 flex flex-col items-center justify-center relative shadow-inner shrink-0 overflow-hidden">
                   <div
-                    className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cyan-500 to-[#06b6d4]/40 transition-all duration-300"
+                    className="absolute bottom-0 start-0 end-0 bg-gradient-to-t from-cyan-500 to-[#06b6d4]/40 transition-all duration-300"
                     style={{
                       height: `${Math.min((user.tonBalance / 0.05) * 100, 100)}%`,
                     }}
@@ -1078,7 +1088,7 @@ export default function HomeTab({
             </div>
 
             {/* CREATIVE FEATURE 2: Interactive Dynamic Airdrop Vesting Scheduler Card */}
-            <div className="bg-gradient-to-b from-[#0a1030]/85 to-[#04081b] border border-cyan-500/15 rounded-3xl p-4 space-y-3.5 shadow-xl sm:text-left text-right font-sans">
+            <div className="bg-gradient-to-b from-[#0a1030]/85 to-[#04081b] border border-cyan-500/15 rounded-3xl p-4 space-y-3.5 shadow-xl sm:text-start text-end font-sans">
               <div className="flex flex-row-reverse sm:flex-row justify-between items-center pb-2 border-b border-blue-950/40">
                 <span className="text-[9px] bg-green-500/10 text-green-500 font-bold px-2 py-0.5 rounded-full border border-emerald-500/15 font-mono">
                   VESTING FLOW
@@ -1104,7 +1114,7 @@ export default function HomeTab({
               <div className="grid grid-cols-3 gap-2 py-1 select-none">
                 {/* Milestone 1 */}
                 <div className="bg-slate-950/90 border border-emerald-500/20 p-2 rounded-xl text-center flex flex-col justify-between space-y-1 shadow-sm relative overflow-hidden">
-                  <div className="absolute top-0 right-0 bg-green-500 text-slate-950 font-black text-[7px] px-1.5 py-0.5 rounded-bl-lg leading-none">
+                  <div className="absolute top-0 end-0 bg-green-500 text-slate-950 font-black text-[7px] px-1.5 py-0.5 rounded-es-lg leading-none">
                     {t("unlocked", "Unlocked")}
                   </div>
                   <span className="text-[8px] font-extrabold text-slate-400 block pt-2.5">
@@ -1244,7 +1254,7 @@ export default function HomeTab({
                     </div>
                   </div>
 
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-extrabold text-slate-100 text-xs">
                       {user.tonBalance.toFixed(3)}
                     </p>
@@ -1272,7 +1282,7 @@ export default function HomeTab({
                     </div>
                   </div>
 
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-extrabold text-indigo-400 text-xs">
                       {user.gqhBalance.toFixed(1)}
                     </p>
@@ -1293,7 +1303,7 @@ export default function HomeTab({
 
               <form onSubmit={handleSwapSubmit} className="space-y-3">
                 <div className="relative">
-                  <label className="text-[8px] text-blue-400/80 font-black absolute left-3 top-1.5 uppercase tracking-widest">
+                  <label className="text-[8px] text-blue-400/80 font-black absolute start-3 top-1.5 uppercase tracking-widest">
                     You Pay
                   </label>
                   <input
@@ -1305,7 +1315,7 @@ export default function HomeTab({
                     step="any"
                     className="w-full bg-slate-950/60 border border-blue-900/40 rounded-xl px-3 pt-4.5 pb-1.5 text-sm font-bold text-slate-200 focus:outline-none focus:border-cyan-500 transition"
                   />
-                  <div className="absolute right-2.5 top-3 flex items-center gap-1">
+                  <div className="absolute end-2.5 top-3 flex items-center gap-1">
                     <button
                       type="button"
                       onClick={handleMax}
@@ -1329,7 +1339,7 @@ export default function HomeTab({
                 </div>
 
                 <div className="relative">
-                  <label className="text-[8px] text-slate-500 font-black absolute left-3 top-1.5 uppercase tracking-widest">
+                  <label className="text-[8px] text-slate-500 font-black absolute start-3 top-1.5 uppercase tracking-widest">
                     Receive (Estimated)
                   </label>
                   <input
@@ -1339,7 +1349,7 @@ export default function HomeTab({
                     placeholder="0.0000"
                     className="w-full bg-slate-950/30 border border-blue-950/30 rounded-xl px-3 pt-4.5 pb-1.5 text-sm font-bold text-slate-400 cursor-not-allowed font-mono"
                   />
-                  <span className="absolute right-3.5 top-3.5 text-[9px] font-black text-blue-500 font-mono">
+                  <span className="absolute end-3.5 top-3.5 text-[9px] font-black text-blue-500 font-mono">
                     GRAM (ton)
                   </span>
                 </div>
@@ -1352,7 +1362,7 @@ export default function HomeTab({
                 )}
 
                 <div className="flex justify-between text-[11px] text-slate-400 px-1 font-medium">
-                  <span>Exchange Standard Rate</span>
+                  <span>{t("exchange_standard_rate", "Exchange Standard Rate")}</span>
                   <span>1 GQH = 0.0001 GRAM</span>
                 </div>
 
@@ -1470,7 +1480,7 @@ export default function HomeTab({
                     style={{ width: `${leagueCapPercent}%` }}
                   />
                 </div>
-                <p className="text-[9px] text-slate-500 leading-normal mt-1 text-left px-1">
+                <p className="text-[9px] text-slate-500 leading-normal mt-1 text-start px-1">
                   💡 Perk unlocked:{" "}
                   <strong className="text-slate-350">{league.perk}</strong>!
                   Next league tier perk unlocks{" "}
@@ -1577,7 +1587,7 @@ export default function HomeTab({
                         </div>
 
                         <span
-                          className={`font-black text-right ${row.isCur ? "text-green-500" : "text-slate-400"}`}
+                          className={`font-black text-end ${row.isCur ? "text-green-500" : "text-slate-400"}`}
                         >
                           {row.val}
                         </span>
@@ -1733,7 +1743,7 @@ export default function HomeTab({
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+              <div className="flex-1 overflow-y-auto space-y-4 pe-1">
                 {/* 1. GQH Balance Progress */}
                 <div className="bg-slate-900/40 border border-slate-800 p-4 rounded-2xl space-y-2.5 backdrop-blur-sm">
                   <div className="flex justify-between items-center">
@@ -1757,7 +1767,7 @@ export default function HomeTab({
                       className="h-full bg-gradient-to-r from-blue-600 to-cyan-400"
                     />
                   </div>
-                  <p className="text-[10px] text-slate-500 text-right">
+                  <p className="text-[10px] text-slate-500 text-end">
                     {user.gqhBalance.toFixed(0)} / 50,000
                   </p>
                 </div>
@@ -1786,7 +1796,7 @@ export default function HomeTab({
                       className="h-full bg-gradient-to-r from-purple-600 to-fuchsia-400"
                     />
                   </div>
-                  <p className="text-[10px] text-slate-500 text-right">
+                  <p className="text-[10px] text-slate-500 text-end">
                     {user.dailyCheckInCount || 0} / 20 {t("days", "Days")}
                   </p>
                 </div>
@@ -1815,7 +1825,7 @@ export default function HomeTab({
                       className="h-full bg-gradient-to-r from-emerald-600 to-green-400"
                     />
                   </div>
-                  <p className="text-[10px] text-slate-500 text-right">
+                  <p className="text-[10px] text-slate-500 text-end">
                     {user.watchedAdsCount || 0} / 200 {t("ads", "Ads")}
                   </p>
                 </div>
@@ -1844,7 +1854,7 @@ export default function HomeTab({
                       className="h-full bg-gradient-to-r from-amber-600 to-yellow-400"
                     />
                   </div>
-                  <p className="text-[9px] text-slate-500 sm:text-left text-right">
+                  <p className="text-[9px] text-slate-500 sm:text-start text-end">
                     {user.telegramTasksCount || 0} / 20{" "}
                     {t("channels_bots", "Channels/Bots")}
                   </p>

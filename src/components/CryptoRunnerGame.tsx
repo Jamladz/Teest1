@@ -407,7 +407,7 @@ export default function CryptoRunnerGame({
   const confirmFinish = () => {
     if (earnedTqh > 0 && (window as any).Adsgram) {
       const AdController = (window as any).Adsgram.init({
-        blockId: "int-36011",
+        blockId: "int-36110",
       });
       AdController.show()
         .then(() => {
@@ -426,7 +426,7 @@ export default function CryptoRunnerGame({
       ref={containerRef}
       className="absolute inset-0 bg-[#0f172a] text-slate-100 flex flex-col z-[2000] overflow-hidden justify-center items-center"
     >
-      <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-[2001] px-2">
+      <div className="absolute top-4 start-4 end-4 flex items-center justify-between z-[2001] px-2">
         <div className="flex gap-2">
           <div className="bg-slate-900/80 border border-slate-700/50 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-2">
             <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse" />
@@ -465,7 +465,7 @@ export default function CryptoRunnerGame({
         >
           <canvas ref={canvasRef} className="w-full h-full" />
           {isPlaying && (
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-slate-500 font-mono text-xs animate-pulse pointer-events-none">
+            <div className="absolute bottom-4 start-1/2 transform -translate-x-1/2 text-slate-500 font-mono text-xs animate-pulse pointer-events-none">
               TAP OR CLICK ANYWHERE ON GAME TO JUMP
             </div>
           )}
