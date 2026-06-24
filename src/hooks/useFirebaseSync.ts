@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { auth, db } from '../lib/firebase';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { UserState, ActivityLog } from '../types';
 
 import { signInAnonymously } from 'firebase/auth';
@@ -9,23 +9,26 @@ import { signInAnonymously } from 'firebase/auth';
 const getInitialUser = (): UserState => {
   let username = 'Telegram User';
   let avatar = 'https://i.imgur.com/LKjClrQ.png';
+  let telegramId: number | null = null;
 
   try {
     if ((window as any).Telegram?.WebApp?.initDataUnsafe?.user) {
       const tgUser = (window as any).Telegram.WebApp.initDataUnsafe.user;
       username = tgUser.username || tgUser.first_name || 'Telegram User';
+      telegramId = tgUser.id;
       // avatar could be dynamically loaded if we had the file, but keep fallback
     }
   } catch (e) {}
 
   return {
     username,
+    telegramId,
     avatar,
     tonBalance: 0.05,
     gqhBalance: 50.0,
     walletAddress: null,
-    referralCount: 12,
-    referralEarnings: 120,
+    referralCount: 0,
+    referralEarnings: 0,
     hasClaimedWelcomeBonus: false,
     telegramJoined: false,
     dailyClaimedAt: null,
@@ -87,7 +90,21 @@ export function useFirebaseSync() {
         } else {
           // Initialize in DB
           try {
-            await setDoc(ref, user);
+            let referredBy = null;
+            try {
+              const initData = (window as any).Telegram?.WebApp?.initDataUnsafe;
+              if (initData?.start_param && initData.start_param.startsWith("ref_")) {
+                referredBy = initData.start_param.replace("ref_", "");
+              }
+            } catch(e) {}
+            
+            const newUserDoc = { ...user, referredBy, createdAt: Date.now() };
+            // Sanitize undefined fields
+            const sanitizeObject = (obj: any) => {
+              return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
+            };
+            await setDoc(ref, sanitizeObject(newUserDoc));
+            setUser(newUserDoc);
           } catch(err) { console.error("Firebase init write failed:", err); }
         }
       } else {
@@ -99,12 +116,39 @@ export function useFirebaseSync() {
 
   // Sync back to Firebase on User changes (debounced or directly)
   // For safety and fast response, we sync local storage quickly and Firebase slightly deferred or immediately
+  // Fetch real referral count
+  useEffect(() => {
+    if (!userId || !user.username) return;
+    
+    const fetchReferrals = async () => {
+      try {
+        const refId = user.telegramId ? String(user.telegramId) : user.username.toLowerCase().replace(/\s+/g, "_");
+        const q = query(collection(db, "users"), where("referredBy", "==", refId));
+        const querySnapshot = await getDocs(q);
+        const count = querySnapshot.size;
+        
+        if (count !== user.referralCount) {
+          setUser(prev => ({ ...prev, referralCount: count }));
+        }
+      } catch (err) {
+        console.error("Failed to fetch referrals:", err);
+      }
+    };
+    
+    fetchReferrals();
+  }, [userId, user.telegramId, user.username]);
+
   useEffect(() => {
     const updatedUser = { ...user, lastActiveAt: Date.now() };
     localStorage.setItem('gramqash_user_v1', JSON.stringify(updatedUser));
     if (userId) {
       const ref = doc(db, 'users', userId);
-      setDoc(ref, updatedUser, { merge: true }).catch(err => console.error("Firebase write err:", err));
+      // Sanitize undefined fields
+      const sanitizeObject = (obj: any) => {
+        return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
+      };
+      
+      setDoc(ref, sanitizeObject(updatedUser), { merge: true }).catch(err => console.error("Firebase write err:", err));
     }
   }, [user, userId]);
 
