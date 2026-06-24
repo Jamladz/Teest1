@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Target,
   X,
@@ -44,6 +45,7 @@ export function TaskCenterModal({
   onOpenWalletModal,
   onPayCustomTask,
 }: TaskCenterModalProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"add" | "my">("add");
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
@@ -261,7 +263,9 @@ export function TaskCenterModal({
                 Number of Clicks / Visitors
               </label>
               <div className="flex items-center gap-4 bg-slate-950 border border-slate-800 rounded-xl p-2 relative">
-                <span className="text-slate-500 text-xs ms-2">{t("min_500", "Min 500")}</span>
+                <span className="text-slate-500 text-xs ms-2">
+                  {t("min_500", "Min 500")}
+                </span>
                 <input
                   type="range"
                   min="500"

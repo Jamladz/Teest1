@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { PlayCircle, Award, Users, Trophy } from "lucide-react";
 import { UserState } from "../types";
 
@@ -8,6 +9,7 @@ interface GameTabProps {
 }
 
 export default function GameTab({ user, onLaunchGame }: GameTabProps) {
+  const { t } = useTranslation();
   // Retrieve high scores dynamically on render
   const [dropBlastHighScore, setDropBlastHighScore] = useState(0);
   const [cryptoRunnerHighScore, setCryptoRunnerHighScore] = useState(0);
@@ -248,7 +250,8 @@ export default function GameTab({ user, onLaunchGame }: GameTabProps) {
               <div className="flex items-center gap-1.5 text-slate-450">
                 <Trophy className="w-3.5 h-3.5 text-yellow-400" />
                 <span>
-                  {t("score_high", "Score: High").replace("High", "")} <strong className="text-yellow-400">High</strong>
+                  {t("score_high", "Score: High").replace("High", "")}{" "}
+                  <strong className="text-yellow-400">High</strong>
                 </span>
               </div>
             </div>
