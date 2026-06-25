@@ -8,6 +8,8 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import {
@@ -19,15 +21,28 @@ import {
   XCircle,
   Trash2,
   ExternalLink,
+  Clock,
+  UserCircle2,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { CustomPromotedTask } from "./TaskCenterModal";
+
+interface AdminUser {
+  id: string;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  balance: number;
+  lastActiveAt: number;
+  withdrawalCount?: number;
+}
 
 export default function AdminTab() {
   const { t } = useTranslation();
   const [totalUsers, setTotalUsers] = useState(0);
   const [activeUsers, setActiveUsers] = useState(0);
   const [withdrawals, setWithdrawals] = useState(0);
+  const [recentUsersList, setRecentUsersList] = useState<AdminUser[]>([]);
   const [customTasks, setCustomTasks] = useState<CustomPromotedTask[]>([]);
 
   useEffect(() => {
@@ -39,13 +54,24 @@ export default function AdminTab() {
 
         let active = 0;
         let withdrawRequests = 0;
+        const now = Date.now();
+        const activeList: AdminUser[] = [];
 
         snapshot.forEach((doc) => {
           const data = doc.data();
 
           // Count users active in the last 24 hours (86400000ms = 24h)
-          if (data.lastActiveAt && Date.now() - data.lastActiveAt < 86400000) {
+          if (data.lastActiveAt && now - data.lastActiveAt < 86400000) {
             active++;
+            activeList.push({
+              id: doc.id,
+              username: data.username || "Unknown",
+              firstName: data.firstName,
+              lastName: data.lastName,
+              balance: data.balance || 0,
+              lastActiveAt: data.lastActiveAt,
+              withdrawalCount: data.withdrawalCount || 0,
+            });
           }
 
           if (data.withdrawalCount && data.withdrawalCount > 0) {
@@ -53,8 +79,12 @@ export default function AdminTab() {
           }
         });
 
+        // Sort active users by most recently active
+        activeList.sort((a, b) => b.lastActiveAt - a.lastActiveAt);
+
         setActiveUsers(active);
         setWithdrawals(withdrawRequests);
+        setRecentUsersList(activeList);
       },
       (error) => {
         console.error("Admin Users fetch error:", error);
@@ -161,6 +191,58 @@ export default function AdminTab() {
               Withdrawal Requests
             </span>
           </motion.div>
+        </div>
+
+        {/* 24h Active Users Section */}
+        <div className="bg-[#1c1c1e] border border-slate-800 rounded-2xl p-4 mb-6">
+          <h3 className="text-sm font-bold text-slate-200 mb-4 flex justify-between items-center">
+            <span className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-cyan-400" />
+              {t("active_users_24h", "Active in 24h")}
+            </span>
+            <span className="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded uppercase font-bold tracking-wider">
+              {recentUsersList.length} {t("users", "Users")}
+            </span>
+          </h3>
+
+          <div className="space-y-3 max-h-60 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+            {recentUsersList.length === 0 ? (
+              <p className="text-xs text-slate-500 text-center py-4">
+                No active users found.
+              </p>
+            ) : (
+              recentUsersList.map((user) => (
+                <div
+                  key={user.id}
+                  className="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0">
+                      <UserCircle2 className="w-5 h-5 text-slate-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-white text-xs font-bold leading-tight">
+                        {user.firstName || user.lastName
+                          ? `${user.firstName || ""} ${user.lastName || ""}`.trim()
+                          : user.username !== "Unknown" ? `@${user.username}` : "Anonymous"}
+                      </h4>
+                      <div className="text-[10px] text-slate-400 mt-0.5 flex gap-2">
+                        <span>@{user.username}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs font-black text-amber-400">
+                      {Math.floor(user.balance).toLocaleString()} GQH
+                    </div>
+                    <div className="text-[9px] text-slate-500 mt-0.5">
+                      {new Date(user.lastActiveAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
         {/* Custom Tasks Admin Review Section */}
