@@ -8,6 +8,8 @@ import { signInAnonymously } from 'firebase/auth';
 // Initial states fallback logic
 const getInitialUser = (): UserState => {
   let username = 'Telegram User';
+  let firstName = '';
+  let lastName = '';
   let avatar = 'https://i.imgur.com/LKjClrQ.png';
   let telegramId: number | null = null;
 
@@ -15,6 +17,8 @@ const getInitialUser = (): UserState => {
     if ((window as any).Telegram?.WebApp?.initDataUnsafe?.user) {
       const tgUser = (window as any).Telegram.WebApp.initDataUnsafe.user;
       username = tgUser.username || tgUser.first_name || 'Telegram User';
+      firstName = tgUser.first_name || '';
+      lastName = tgUser.last_name || '';
       telegramId = tgUser.id;
       // avatar could be dynamically loaded if we had the file, but keep fallback
     }
@@ -22,6 +26,8 @@ const getInitialUser = (): UserState => {
 
   return {
     username,
+    firstName,
+    lastName,
     telegramId,
     avatar,
     tonBalance: 0.05,
