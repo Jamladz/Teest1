@@ -39,6 +39,8 @@ import CryptoRunnerGame from "./components/CryptoRunnerGame";
 import CardMatchGame from "./components/CardMatchGame";
 
 import { useTranslation } from "react-i18next";
+import { collection, query, where, getCountFromServer } from "firebase/firestore";
+import { db } from "./lib/firebase";
 
 // Static config
 const FALLBACK_TON_PRICE = 7.25;
@@ -128,32 +130,28 @@ export default function App() {
   const [adCountdown, setAdCountdown] = useState(15);
   const [adCooldown, setAdCooldown] = useState(0);
 
-  // Online Users Simulation
-  const [onlineUsers, setOnlineUsers] = useState<number>(() => {
-    return Math.floor(Math.random() * (300000 - 100000 + 1)) + 100000;
-  });
+  // Real 24h Active Users
+  const [onlineUsers, setOnlineUsers] = useState<number>(0);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    const updateOnlineUsers = () => {
-      setOnlineUsers((prev) => {
-        // Fluctuates realistically (randomly adds or subtracts -15 to +40 users, tending slowly upwards or downwards randomly)
-        const change = Math.floor(Math.random() * 55) - 20;
-        const newTotal = prev + change;
-        // Strict boundary constraints
-        if (newTotal < 100000) return 100100;
-        if (newTotal > 300000) return 299900;
-        return newTotal;
-      });
-      // Random interval between 1.5s to 4s
-      const nextUpdate = Math.random() * 2500 + 1500;
-      timeoutId = setTimeout(updateOnlineUsers, nextUpdate);
+    const fetchActiveUsers = async () => {
+      try {
+        const yesterday = Date.now() - 86400000;
+        const q = query(
+          collection(db, "users"),
+          where("lastActiveAt", ">", yesterday)
+        );
+        const snapshot = await getCountFromServer(q);
+        setOnlineUsers(snapshot.data().count);
+      } catch (error) {
+        console.error("Failed to fetch active users", error);
+      }
     };
 
-    timeoutId = setTimeout(updateOnlineUsers, Math.random() * 2000 + 1000);
-
-    return () => clearTimeout(timeoutId);
+    fetchActiveUsers();
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchActiveUsers, 300000);
+    return () => clearInterval(interval);
   }, []);
 
   // Global Dynamic Status Notification (Toast)
